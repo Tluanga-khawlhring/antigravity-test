@@ -310,7 +310,7 @@ ul {
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  border: none;
+  border: 1.5px solid transparent;
   transition: var(--transition);
   display: inline-flex;
   align-items: center;
