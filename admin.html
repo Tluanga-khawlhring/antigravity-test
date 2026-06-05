@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Saikhamakawn Church</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="config.js"></script>
+</head>
+<body class="admin-body" id="adminBody">
+
+  <!-- ── PASSWORD GATE ───────────────────────────────────────── -->
+  <div class="pw-gate" id="pwGate">
+    <div class="pw-card">
+      <div class="pw-cross">✝</div>
+      <h2 class="pw-title">Admin Access</h2>
+      <p class="pw-sub">Kristian Thalai Pawl</p>
+      <div class="pw-field-wrap" id="pwFieldWrap">
+        <input
+          type="password"
+          class="pw-input"
+          id="pwInput"
+          placeholder="Enter password"
+          autocomplete="current-password"
+          autofocus
+        />
+        <button class="pw-toggle" id="pwToggle" aria-label="Show password">👁</button>
+      </div>
+      <p class="pw-error" id="pwError">Incorrect password. Try again.</p>
+      <button class="btn btn-primary" id="pwSubmit" style="width:100%">Unlock →</button>
+    </div>
+  </div>
+
+  <!-- ── TOP BAR ───────────────────────────────────────────── -->
+  <header class="admin-topbar">
+    <div class="admin-brand">
+      <span>✝</span>
+      Kristian Thalai Pawl
+      <span class="admin-badge">ADMIN</span>
+    </div>
+    <div style="display:flex;gap:0.75rem;align-items:center;">
+      <a href="index.html" class="btn btn-outline btn-sm">← View Site</a>
+      <button class="btn btn-danger btn-sm" id="clearAllBtn" title="Reset all data">🗑 Clear All</button>
+    </div>
+  </header>
+
+  <div class="admin-layout">
+
+    <!-- ── SIDEBAR ───────────────────────────────────────────── -->
+    <aside class="admin-sidebar">
+      <span class="sidebar-label">Overview</span>
+      <button class="sidebar-btn active" data-panel="dashboard" id="sb-dashboard">
+        <span class="sidebar-icon">📊</span> Dashboard
+      </button>
+
+      <span class="sidebar-label">Content</span>
+      <button class="sidebar-btn" data-panel="photos" id="sb-photos">
+        <span class="sidebar-icon">📷</span> Photo Albums
+      </button>
+      <button class="sidebar-btn" data-panel="videos" id="sb-videos">
+        <span class="sidebar-icon">🎬</span> Videos
+      </button>
+      <button class="sidebar-btn" data-panel="documents" id="sb-documents">
+        <span class="sidebar-icon">📄</span> Documents
+      </button>
+
+      <span class="sidebar-label">System</span>
+      <button class="sidebar-btn" data-panel="settings" id="sb-settings">
+        <span class="sidebar-icon">⚙️</span> Settings
+      </button>
+    </aside>
+
+    <!-- ── MAIN ──────────────────────────────────────────────── -->
+    <main class="admin-main">
+
+      <!-- DASHBOARD ── -->
+      <section class="admin-panel active" id="panel-dashboard">
+        <h1 class="admin-panel-title">Dashboard</h1>
+        <p class="admin-panel-sub">Overview of all your church media content.</p>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1rem;margin-bottom:2rem;">
+          <div class="stat-card" id="dash-stat-photos">
+            <div class="stat-card-icon">📷</div>
+            <div class="stat-card-num" id="d-photos">0</div>
+            <div class="stat-card-label">Photo Albums</div>
+          </div>
+          <div class="stat-card" id="dash-stat-videos">
+            <div class="stat-card-icon">🎬</div>
+            <div class="stat-card-num" id="d-videos">0</div>
+            <div class="stat-card-label">Sermon Videos</div>
+          </div>
+          <div class="stat-card" id="dash-stat-docs">
+            <div class="stat-card-icon">📄</div>
+            <div class="stat-card-num" id="d-docs">0</div>
+            <div class="stat-card-label">Documents</div>
+          </div>
+        </div>
+
+        <div class="admin-form" style="margin-bottom:0">
+          <div class="admin-form-title">💡 Quick Guide</div>
+          <ul style="list-style:disc;padding-left:1.5rem;color:var(--c-text-sub);font-size:0.88rem;line-height:2;">
+            <li>Go to <strong style="color:var(--c-text)">Photo Albums</strong> → paste a Google Drive <em>folder</em> share link (e.g., <code>https://drive.google.com/drive/folders/…</code>).</li>
+            <li>Go to <strong style="color:var(--c-text)">Videos</strong> → paste any YouTube video URL and it will be embedded automatically.</li>
+            <li>Go to <strong style="color:var(--c-text)">Documents</strong> → paste a Google Drive <em>file</em> share link for PDFs/docs.</li>
+            <li>All data is stored in your browser's local storage.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- PHOTOS ── -->
+      <section class="admin-panel" id="panel-photos">
+        <h1 class="admin-panel-title">Photo Albums</h1>
+        <p class="admin-panel-sub">Add Google Drive folder links as photo albums.</p>
+
+        <div class="admin-form">
+          <div class="admin-form-title">➕ Add New Album</div>
+
+          <div class="form-group">
+            <label class="form-label" for="photo-title">Album Title *</label>
+            <input type="text" class="form-control" id="photo-title" placeholder="e.g., Easter Sunday 2024" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="photo-url">Google Drive Folder URL *</label>
+            <input type="url" class="form-control" id="photo-url"
+              placeholder="https://drive.google.com/drive/folders/..." />
+            <p class="form-hint">Share the folder → "Anyone with the link" → copy the URL</p>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="photo-date">Date</label>
+              <input type="date" class="form-control" id="photo-date" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="photo-desc">Short Description</label>
+              <input type="text" class="form-control" id="photo-desc" placeholder="Optional" />
+            </div>
+          </div>
+
+          <button class="btn btn-primary" id="addPhotoBtn">Add Album</button>
+        </div>
+
+        <div class="admin-form-title" style="margin-bottom:1rem;">📋 All Albums (<span id="photo-count">0</span>)</div>
+        <div class="admin-list" id="photosList">
+          <div class="admin-empty-list">No albums yet.</div>
+        </div>
+      </section>
+
+      <!-- VIDEOS ── -->
+      <section class="admin-panel" id="panel-videos">
+        <h1 class="admin-panel-title">Sermon Videos</h1>
+        <p class="admin-panel-sub">Add YouTube video links for sermons and events.</p>
+
+        <div class="admin-form">
+          <div class="admin-form-title">➕ Add New Video</div>
+
+          <div class="form-group">
+            <label class="form-label" for="video-title">Video Title *</label>
+            <input type="text" class="form-control" id="video-title" placeholder="e.g., Sunday Sermon — John 3:16" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="video-url">YouTube URL *</label>
+            <input type="url" class="form-control" id="video-url"
+              placeholder="https://www.youtube.com/watch?v=..." />
+            <p class="form-hint">Supports watch URLs, youtu.be short links, and YouTube Shorts</p>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="video-preacher">Preacher / Speaker</label>
+              <input type="text" class="form-control" id="video-preacher" placeholder="Optional" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="video-date">Date</label>
+              <input type="date" class="form-control" id="video-date" />
+            </div>
+          </div>
+
+          <button class="btn btn-primary" id="addVideoBtn">Add Video</button>
+        </div>
+
+        <div class="admin-form-title" style="margin-bottom:1rem;">📋 All Videos (<span id="video-count">0</span>)</div>
+        <div class="admin-list" id="videosList">
+          <div class="admin-empty-list">No videos yet.</div>
+        </div>
+      </section>
+
+      <!-- DOCUMENTS ── -->
+      <section class="admin-panel" id="panel-documents">
+        <h1 class="admin-panel-title">Documents</h1>
+        <p class="admin-panel-sub">Add Google Drive PDF and document links.</p>
+
+        <div class="admin-form">
+          <div class="admin-form-title">➕ Add New Document</div>
+
+          <div class="form-group">
+            <label class="form-label" for="doc-title">Document Title *</label>
+            <input type="text" class="form-control" id="doc-title" placeholder="e.g., Weekly Bulletin — June 2024" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="doc-url">Google Drive File URL *</label>
+            <input type="url" class="form-control" id="doc-url"
+              placeholder="https://drive.google.com/file/d/.../view" />
+            <p class="form-hint">Open Drive file → Share → "Anyone with the link" → copy URL</p>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="doc-category">Category</label>
+              <select class="form-control" id="doc-category">
+                <option value="">Select category…</option>
+                <option value="Bulletin">Weekly Bulletin</option>
+                <option value="Sermon Notes">Sermon Notes</option>
+                <option value="Announcement">Announcement</option>
+                <option value="Report">Annual Report</option>
+                <option value="Forms">Forms</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="doc-date">Date</label>
+              <input type="date" class="form-control" id="doc-date" />
+            </div>
+          </div>
+
+          <button class="btn btn-primary" id="addDocBtn">Add Document</button>
+        </div>
+
+        <div class="admin-form-title" style="margin-bottom:1rem;">📋 All Documents (<span id="doc-count">0</span>)</div>
+        <div class="admin-list" id="docsList">
+          <div class="admin-empty-list">No documents yet.</div>
+        </div>
+      </section>
+
+      <!-- SETTINGS ── -->
+      <section class="admin-panel" id="panel-settings">
+        <h1 class="admin-panel-title">⚙️ Settings</h1>
+        <p class="admin-panel-sub">Connect Firebase so your content shows on all devices.</p>
+
+        <!-- Status banner -->
+        <div class="settings-status" id="settingsStatus">
+          <div class="settings-status-dot" id="statusDot"></div>
+          <span id="statusText">Checking connection…</span>
+        </div>
+
+        <!-- Firebase setup card -->
+        <div class="admin-form" style="margin-bottom:1.5rem">
+          <div class="admin-form-title">🔥 Firebase Realtime Database</div>
+
+          <div class="form-group">
+            <label class="form-label" for="fbUrl">Database URL</label>
+            <input type="url" class="form-control" id="fbUrl"
+              placeholder="https://your-project-default-rtdb.firebaseio.com" />
+            <p class="form-hint">Paste your Firebase Realtime Database URL here</p>
+          </div>
+
+          <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:0.5rem">
+            <button class="btn btn-primary" id="saveConfigBtn">💾 Save & Test Connection</button>
+            <button class="btn btn-outline btn-sm" id="downloadConfigBtn">⬇ Download config.js</button>
+          </div>
+        </div>
+
+        <!-- Step-by-step guide -->
+        <div class="admin-form" style="margin-bottom:1.5rem">
+          <div class="admin-form-title">📋 Setup Guide (5 minutes, free)</div>
+          <ol class="setup-steps">
+            <li>Go to <a href="https://console.firebase.google.com" target="_blank" class="setup-link">console.firebase.google.com</a> and sign in with your Google account.</li>
+            <li>Click <strong>Add project</strong> → name it anything → click through and create.</li>
+            <li>In the left sidebar click <strong>Build → Realtime Database</strong>.</li>
+            <li>Click <strong>Create database</strong> → choose any location → select <strong>"Start in test mode"</strong> → Enable.</li>
+            <li>Copy the Database URL shown at the top (looks like <code>https://your-project-rtdb.firebaseio.com</code>).</li>
+            <li>Paste it in the field above → click <strong>Save & Test Connection</strong>.</li>
+            <li>Click <strong>⬇ Download config.js</strong> → upload that file to your Netlify site (drag & drop into Netlify deploy).</li>
+          </ol>
+        </div>
+
+        <!-- Migrate local data -->
+        <div class="admin-form">
+          <div class="admin-form-title">📤 Migrate Existing Data</div>
+          <p style="font-size:0.88rem;color:var(--c-text-sub);margin-bottom:1rem;line-height:1.7">
+            If you already added content on this device, click below to push all your local data up to Firebase so it's visible everywhere.
+          </p>
+          <button class="btn btn-outline" id="migrateBtn">⬆ Push Local Data to Firebase</button>
+        </div>
+      </section>
+
+    </main>
+  </div><!-- end admin-layout -->
+
+  <!-- ── EDIT MODAL ───────────────────────────────────────── -->
+  <div class="edit-modal-overlay" id="editModalOverlay">
+    <div class="edit-modal" id="editModal" role="dialog" aria-label="Edit item">
+      <div class="edit-modal-header">
+        <h2 class="edit-modal-title" id="editModalTitle">Edit Item</h2>
+        <button class="edit-modal-close" id="editModalClose" aria-label="Close">&times;</button>
+      </div>
+      <div class="edit-modal-body" id="editModalBody">
+        <!-- injected by JS -->
+      </div>
+      <div class="edit-modal-footer">
+        <button class="btn btn-outline btn-sm" id="editModalCancel">Cancel</button>
+        <button class="btn btn-primary" id="editModalSave">💾 Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TOAST CONTAINER ──────────────────────────────────── -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="admin.js"></script>
+  <script>
+    /* ── PASSWORD GATE ─────────────────────────── */
+    (function () {
+      const CORRECT = 'skkktp';
+      const SESSION_KEY = 'skchurch_admin_auth';
+      const gate   = document.getElementById('pwGate');
+      const body   = document.getElementById('adminBody');
+      const input  = document.getElementById('pwInput');
+      const submit = document.getElementById('pwSubmit');
+      const errMsg = document.getElementById('pwError');
+      const toggle = document.getElementById('pwToggle');
+      const wrap   = document.getElementById('pwFieldWrap');
+
+      function unlock() {
+        gate.style.opacity = '0';
+        setTimeout(() => gate.remove(), 400);
+        sessionStorage.setItem(SESSION_KEY, '1');
+      }
+
+      function shake() {
+        wrap.classList.remove('shake');
+        void wrap.offsetWidth; /* reflow */
+        wrap.classList.add('shake');
+        errMsg.style.display = 'block';
+        input.value = '';
+        input.focus();
+      }
+
+      function attempt() {
+        if (input.value === CORRECT) {
+          unlock();
+        } else {
+          shake();
+        }
+      }
+
+      /* Already authenticated this session */
+      if (sessionStorage.getItem(SESSION_KEY) === '1') {
+        gate.remove();
+        return;
+      }
+
+      gate.style.opacity = '1';
+
+      submit.addEventListener('click', attempt);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') attempt(); });
+
+      toggle.addEventListener('click', () => {
+        input.type = input.type === 'password' ? 'text' : 'password';
+        toggle.textContent = input.type === 'password' ? '👁' : '🙈';
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SKK KTP</title>
+  <meta name="description" content="Official media library of Kristian Thalai Pawl — browse photos, documents, and sermon videos." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="config.js"></script>
+</head>
+<body>
+
+  <!-- ── LOADING OVERLAY ──────────────────────────────────── -->
+  <div class="site-loader" id="siteLoader">
+    <div class="site-loader-cross">✝</div>
+    <div class="site-loader-bar"><div class="site-loader-fill"></div></div>
+  </div>
+
+  <!-- ── NAV ─────────────────────────────────────────────────── -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-brand">
+      <div class="nav-cross">✝</div>
+      <span>Saikhamakan Kristian Thalai Pawl</span>
+    </div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#home"     class="nav-link active" data-section="home">Home</a></li>
+      <li><a href="#photos"   class="nav-link"        data-section="photos">Photos</a></li>
+      <li><a href="#videos"   class="nav-link"        data-section="videos">Videos</a></li>
+      <li><a href="#documents" class="nav-link"       data-section="documents">Documents</a></li>
+    </ul>
+    <a href="admin.html" class="nav-admin-btn" id="adminBtn">⚙ Admin</a>
+    <button class="nav-hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- ── HERO ─────────────────────────────────────────────────── -->
+  <section class="hero" id="home">
+    <div class="hero-bg-overlay"></div>
+    <div class="particles" id="particles"></div>
+    <div class="hero-content">
+      <div class="hero-cross-icon">✝</div>
+      <p class="hero-tagline">Welcome to</p>
+      <h1 class="hero-title">Saikhamakawn<br/><span>Kristian Thalai Pawl</span></h1>
+      <p class="hero-sub">Explore our photo galleries, sermon videos, and documents from our community.</p>
+      <div class="hero-actions">
+        <a href="#photos" class="btn btn-primary">Browse Gallery</a>
+        <a href="#videos" class="btn btn-outline">Watch Sermons</a>
+      </div>
+    </div>
+    <div class="hero-scroll-hint">
+      <div class="scroll-icon"></div>
+      <span>Scroll to explore</span>
+    </div>
+  </section>
+
+  <!-- ── STATS BAR ─────────────────────────────────────────────── -->
+  <section class="stats-bar" id="statsBar">
+    <div class="stat-item">
+      <span class="stat-number" id="statPhotos">0</span>
+      <span class="stat-label">Photo Albums</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-number" id="statVideos">0</span>
+      <span class="stat-label">Videos</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-number" id="statDocs">0</span>
+      <span class="stat-label">Documents</span>
+    </div>
+  </section>
+
+  <!-- ── PHOTOS SECTION ─────────────────────────────────────────── -->
+  <section class="section" id="photos">
+    <div class="section-header">
+      <div class="section-badge">📷 Gallery</div>
+      <h2 class="section-title">Photo Albums</h2>
+      <p class="section-sub">Cherished moments from our church community</p>
+    </div>
+    <div class="card-grid" id="photosGrid">
+      <div class="empty-state" id="photosEmpty">
+        <div class="empty-icon">🖼️</div>
+        <p>No photo albums yet.</p>
+        <span>Add albums from the Admin panel.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── VIDEOS SECTION ─────────────────────────────────────────── -->
+  <section class="section section-alt" id="videos">
+    <div class="section-header">
+      <div class="section-badge">🎬 Videos</div>
+      <h2 class="section-title">Youtube</h2>
+      <p class="section-sub">
+        <a href="https://www.youtube.com/@ktpskk" target="_blank" rel="noopener noreferrer"
+           style="color:var(--c-gold);text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:opacity .2s"
+           onmouseover="this.style.opacity='.75'" onmouseout="this.style.opacity='1'">
+          ▶ youtube.com/@ktpskk
+        </a>
+      </p>
+    </div>
+    <div class="card-grid" id="videosGrid">
+      <div class="empty-state" id="videosEmpty">
+        <div class="empty-icon">🎥</div>
+        <p>No videos yet.</p>
+        <span>Add YouTube links from the Admin panel.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── DOCUMENTS SECTION ─────────────────────────────────────── -->
+  <section class="section" id="documents">
+    <div class="section-header">
+      <div class="section-badge">📄 Library</div>
+      <h2 class="section-title">Documents</h2>
+      <p class="section-sub">Bulletins, notices & resources from our church</p>
+    </div>
+    <div class="doc-grid" id="docsGrid">
+      <div class="empty-state" id="docsEmpty">
+        <div class="empty-icon">📂</div>
+        <p>No documents yet.</p>
+        <span>Add PDFs from the Admin panel.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ─────────────────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="footer-cross">✝</div>
+    <p class="footer-name" style="margin-bottom: 0.25rem;">Kristian Thalai Pawl</p>
+    <a href="https://www.instagram.com/ktp_saikhamakawn_branch/" target="_blank" rel="noopener noreferrer" style="color:var(--c-gold); text-decoration:none; display:inline-flex; align-items:center; gap:8px; margin-bottom: 1.25rem; transition: opacity .2s;" onmouseover="this.style.opacity='.75'" onmouseout="this.style.opacity='1'">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      <span style="font-size: 0.95rem; font-weight: 500;">Follow us on Instagram</span>
+    </a>
+    <p class="footer-copy">&copy; <span id="footerYear"></span> All rights reserved.</p>
+  </footer>
+
+  <!-- ── LIGHTBOX ───────────────────────────────────────────────── -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-label="Media viewer">
+    <button class="lightbox-close" id="lightboxClose" aria-label="Close">&times;</button>
+    <div class="lightbox-body" id="lightboxBody"></div>
+  </div>
+
+  <!-- ── BACK TO TOP ─────────────────────────────────────────── -->
+  <button class="back-to-top" id="backToTop" aria-label="Back to top" title="Back to top">
+    &#8679;
+  </button>
+
+  <script src="app.js"></script>
+</body>
+</html>
