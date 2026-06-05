@@ -252,17 +252,23 @@
 
         <!-- Firebase setup card -->
         <div class="admin-form" style="margin-bottom:1.5rem">
-          <div class="admin-form-title">🔥 Firebase Realtime Database</div>
+          <div class="admin-form-title">🔥 Configuration</div>
 
           <div class="form-group">
-            <label class="form-label" for="fbUrl">Database URL</label>
+            <label class="form-label" for="fbUrl">Firebase Database URL</label>
             <input type="url" class="form-control" id="fbUrl"
               placeholder="https://your-project-default-rtdb.firebaseio.com" />
             <p class="form-hint">Paste your Firebase Realtime Database URL here</p>
           </div>
 
-          <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:0.5rem">
-            <button class="btn btn-primary" id="saveConfigBtn">💾 Save & Test Connection</button>
+          <div class="form-group" style="margin-top:1rem">
+            <label class="form-label" for="driveKey">Google Drive API Key (for native photo gallery)</label>
+            <input type="text" class="form-control" id="driveKey" placeholder="AIzaSy..." />
+            <p class="form-hint">Generate from Google Cloud Console to display Drive folders directly on the site.</p>
+          </div>
+
+          <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem">
+            <button class="btn btn-primary" id="saveConfigBtn">💾 Save Configuration</button>
             <button class="btn btn-outline btn-sm" id="downloadConfigBtn">⬇ Download config.js</button>
           </div>
         </div>
