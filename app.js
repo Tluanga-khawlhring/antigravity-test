@@ -4,12 +4,19 @@
 
 const STORE_KEY  = 'skchurch_data';
 const CONFIG_KEY = 'skchurch_firebase_url';
+const DRIVE_KEY  = 'skchurch_drive_key';
 
 /* ─── DATA LAYER ─────────────────────────────────────────── */
 function getFirebaseUrl() {
   // Priority: config.js file → localStorage override
   return (window.SK_CONFIG?.firebaseUrl) ||
          localStorage.getItem(CONFIG_KEY) ||
+         '';
+}
+
+function getDriveKey() {
+  return (window.SK_CONFIG?.googleDriveApiKey) ||
+         localStorage.getItem(DRIVE_KEY) ||
          '';
 }
 
@@ -54,6 +61,28 @@ function driveThumbnail(url) {
   return null;
 }
 
+function getFolderId(url) {
+  const m = url.match(/folders\/([a-zA-Z0-9_-]+)/);
+  if (m) return m[1];
+  const m2 = url.match(/id=([a-zA-Z0-9_-]+)/);
+  return m2 ? m2[1] : null;
+}
+
+async function fetchDriveImages(folderId) {
+  const apiKey = getDriveKey();
+  if (!apiKey) return [];
+  try {
+    const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+mimeType+contains+'image/'&key=${apiKey}&fields=files(id,name,thumbnailLink,webContentLink)&pageSize=100`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('API fetch failed');
+    const data = await res.json();
+    return data.files || [];
+  } catch(e) {
+    console.warn('Drive API failed:', e.message);
+    return [];
+  }
+}
+
 function formatDate(iso) {
   if (!iso) return '';
   return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
@@ -70,6 +99,15 @@ function hideLoader() {
   if (!el) return;
   el.style.opacity = '0';
   setTimeout(() => el.remove(), 500);
+}
+
+function openLightbox(html) {
+  const lb   = document.getElementById('lightbox');
+  const body = document.getElementById('lightboxBody');
+  if (!lb || !body) return;
+  body.innerHTML = html;
+  lb.classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 
 /* ─── STATS ──────────────────────────────────────────────── */
@@ -92,13 +130,13 @@ function animateCount(id, target) {
 }
 
 /* ─── RENDER PHOTOS ──────────────────────────────────────── */
-function renderPhotos(data) {
+async function renderPhotos(data) {
   const grid  = document.getElementById('photosGrid');
   const empty = document.getElementById('photosEmpty');
   if (!grid) return;
 
   const photos = data.photos || [];
-  [...grid.querySelectorAll('.photo-card')].forEach(el => el.remove());
+  grid.innerHTML = '';
 
   if (photos.length === 0) {
     if (empty) empty.style.display = '';
@@ -106,30 +144,58 @@ function renderPhotos(data) {
   }
   if (empty) empty.style.display = 'none';
 
-  photos.forEach(item => {
-    const card = document.createElement('div');
-    card.className = 'photo-card';
-
-    const thumb = driveThumbnail(item.url);
-    card.innerHTML = `
-      ${thumb
-        ? `<img class="photo-card-thumb" src="${thumb}" alt="${item.title}" loading="lazy"
-              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
-        : ''}
-      <div class="photo-card-thumb-placeholder" style="${thumb ? 'display:none' : ''}">
-        📁<span>Google Drive Album</span>
-      </div>
-      <div class="photo-card-body">
-        <div class="photo-card-title">${item.title}</div>
-        <div class="photo-card-meta">
-          <span>📅</span> ${formatDate(item.date) || 'Album'}
-          ${item.description ? `<span>· ${item.description.slice(0,30)}${item.description.length>30?'…':''}</span>` : ''}
-        </div>
+  for (const item of photos) {
+    const albumContainer = document.createElement('div');
+    albumContainer.className = 'album-container';
+    
+    const header = document.createElement('div');
+    header.className = 'album-header';
+    header.innerHTML = `
+      <h3 class="album-title">${item.title}</h3>
+      <div class="album-meta">
+        ${formatDate(item.date) ? `<span>📅 ${formatDate(item.date)}</span>` : ''}
+        ${item.description ? `<span>· ${item.description}</span>` : ''}
+        <span>· <a href="${item.url}" target="_blank" style="color:var(--c-gold)">Open in Drive ↗</a></span>
       </div>
     `;
-    card.addEventListener('click', () => window.open(item.url, '_blank'));
-    grid.appendChild(card);
-  });
+    albumContainer.appendChild(header);
+
+    const photoGrid = document.createElement('div');
+    photoGrid.className = 'album-photo-grid';
+    albumContainer.appendChild(photoGrid);
+    
+    grid.appendChild(albumContainer);
+
+    const folderId = getFolderId(item.url);
+    if (folderId && getDriveKey()) {
+      // Show loading indicator
+      photoGrid.innerHTML = '<div class="album-loading">Loading photos...</div>';
+      
+      const files = await fetchDriveImages(folderId);
+      photoGrid.innerHTML = '';
+      
+      if (files.length > 0) {
+        files.forEach(f => {
+          const thumb = f.thumbnailLink ? f.thumbnailLink.replace('=s220', '=w400') : '';
+          const imgUrl = f.thumbnailLink ? f.thumbnailLink.replace('=s220', '=s2000') : f.webContentLink;
+          
+          const photoCard = document.createElement('div');
+          photoCard.className = 'album-photo-card';
+          photoCard.innerHTML = `<img src="${thumb}" alt="${f.name}" loading="lazy">`;
+          
+          photoCard.addEventListener('click', () => {
+            openLightbox(`<img src="${imgUrl}" alt="${f.name}" class="lightbox-img">`);
+          });
+          
+          photoGrid.appendChild(photoCard);
+        });
+      } else {
+        photoGrid.innerHTML = `<div class="album-empty">No images found, or folder is private.</div>`;
+      }
+    } else {
+      photoGrid.innerHTML = `<div class="album-empty">API Key not set or invalid folder URL. <a href="${item.url}" target="_blank">View on Drive</a></div>`;
+    }
+  }
 }
 
 /* ─── RENDER VIDEOS ──────────────────────────────────────── */

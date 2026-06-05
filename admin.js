@@ -29,6 +29,7 @@
 /* ─── CONSTANTS ──────────────────────────────────────────── */
 const STORE_KEY  = 'skchurch_data';
 const CONFIG_KEY = 'skchurch_firebase_url';
+const DRIVE_KEY  = 'skchurch_drive_key';
 
 /* ─── FIREBASE URL ───────────────────────────────────────── */
 function getFirebaseUrl() {
@@ -42,6 +43,18 @@ function setFirebaseUrl(url) {
   // Also patch in-memory config so current session uses it
   if (!window.SK_CONFIG) window.SK_CONFIG = {};
   window.SK_CONFIG.firebaseUrl = url.trim();
+}
+
+function getDriveKey() {
+  return (window.SK_CONFIG?.googleDriveApiKey) ||
+         localStorage.getItem(DRIVE_KEY) ||
+         '';
+}
+
+function setDriveKey(key) {
+  localStorage.setItem(DRIVE_KEY, key.trim());
+  if (!window.SK_CONFIG) window.SK_CONFIG = {};
+  window.SK_CONFIG.googleDriveApiKey = key.trim();
 }
 
 /* ─── DATA LAYER ─────────────────────────────────────────── */
@@ -491,13 +504,15 @@ window.deleteItem = async function(type, id) {
    ═══════════════════════════════════════════════════════════ */
 async function initSettingsPanel() {
   const input  = document.getElementById('fbUrl');
+  const driveInput = document.getElementById('driveKey');
   const dot    = document.getElementById('statusDot');
   const text   = document.getElementById('statusText');
   if (!input) return;
 
-  // Pre-fill current URL
+  // Pre-fill current URL & Key
   const current = getFirebaseUrl();
   input.value = current;
+  if (driveInput) driveInput.value = getDriveKey();
 
   // Check connection status
   async function checkStatus(url) {
@@ -531,15 +546,18 @@ async function initSettingsPanel() {
       toast('URL should look like: https://your-project-rtdb.firebasedatabase.app', 'error'); return;
     }
     setFirebaseUrl(url);
+    if (driveInput) setDriveKey(driveInput.value.trim());
+    
     const ok = await checkStatus(url);
-    if (ok) toast('Firebase connected! ✓');
-    else toast('Could not connect. Double-check your URL.', 'error');
+    if (ok) toast('Configuration saved and Firebase connected! ✓');
+    else toast('Configuration saved, but could not connect to Firebase.', 'error');
   };
 
   // Download config.js
   document.getElementById('downloadConfigBtn').onclick = () => {
     const url = input.value.trim() || getFirebaseUrl();
-    const content = `/**\n * SAIKHAMAKAWN CHURCH — CONFIG\n * Auto-generated — upload this file to Netlify to sync across all devices.\n */\nwindow.SK_CONFIG = {\n  firebaseUrl: '${url}'\n};\n`;
+    const dKey = driveInput ? driveInput.value.trim() : getDriveKey();
+    const content = `/**\n * SAIKHAMAKAWN CHURCH — CONFIG\n * Auto-generated — upload this file to Netlify to sync across all devices.\n */\nwindow.SK_CONFIG = {\n  firebaseUrl: '${url}',\n  googleDriveApiKey: '${dKey}'\n};\n`;
     const blob = new Blob([content], { type: 'text/javascript' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);

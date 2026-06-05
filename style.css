@@ -520,88 +520,93 @@ ul {
   gap: 1.5rem;
 }
 
-/* ── PHOTO CARD ─────────────────────────────────────────────── */
-.photo-card {
+/* ── NATIVE ALBUM GALLERY ───────────────────────────────────────── */
+.album-container {
+  grid-column: 1 / -1;
+  margin-bottom: 3rem;
+}
+
+.album-header {
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--c-border);
+  padding-bottom: 1rem;
+}
+
+.album-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1.6rem;
+  color: var(--c-white);
+  margin-bottom: 0.5rem;
+}
+
+.album-meta {
+  font-size: 0.85rem;
+  color: var(--c-text-sub);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.album-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.album-photo-card {
   position: relative;
-  background: var(--c-surface);
-  border: 1px solid var(--c-border);
-  border-radius: var(--radius-lg);
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
   overflow: hidden;
   cursor: pointer;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
   transition: var(--transition);
-  group: 1;
 }
 
-.photo-card:hover {
-  transform: translateY(-6px);
-  border-color: rgba(201, 168, 76, 0.35);
-  box-shadow: var(--shadow-glow), var(--shadow-card);
-}
-
-.photo-card-thumb {
+.album-photo-card img {
   width: 100%;
-  aspect-ratio: 4/3;
+  height: 100%;
   object-fit: cover;
-  display: block;
-  transition: transform 0.5s ease;
-  background: var(--c-surface2);
+  transition: transform 0.4s ease;
 }
 
-.photo-card:hover .photo-card-thumb {
+.album-photo-card:hover {
+  border-color: rgba(201, 168, 76, 0.4);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+.album-photo-card:hover img {
   transform: scale(1.05);
 }
 
-.photo-card-thumb-placeholder {
-  width: 100%;
-  aspect-ratio: 4/3;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, rgba(201, 168, 76, 0.08) 0%, rgba(59, 130, 246, 0.06) 100%);
-  font-size: 3rem;
+.album-loading {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem;
   color: var(--c-gold);
-  gap: 0.5rem;
-  transition: transform 0.5s ease;
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  animation: pulse 1.5s infinite;
 }
 
-.photo-card:hover .photo-card-thumb-placeholder {
-  transform: scale(1.05);
-}
-
-.photo-card-thumb-placeholder span {
-  font-size: 0.75rem;
+.album-empty {
+  grid-column: 1 / -1;
+  padding: 2rem;
+  text-align: center;
+  background: var(--c-surface);
+  border: 1px dashed var(--c-border);
+  border-radius: var(--radius-sm);
   color: var(--c-text-sub);
-  font-family: 'Inter', sans-serif;
-  letter-spacing: 0.05em;
+  font-size: 0.9rem;
 }
 
-.photo-card-body {
-  padding: 1.1rem 1.2rem 1.3rem;
-}
-
-.photo-card-title {
-  font-weight: 600;
-  font-size: 0.98rem;
-  color: var(--c-text);
-  margin-bottom: 4px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.photo-card-meta {
-  font-size: 0.78rem;
-  color: var(--c-text-sub);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.photo-card-actions {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
 }
 
 /* ── VIDEO CARD ─────────────────────────────────────────────── */
