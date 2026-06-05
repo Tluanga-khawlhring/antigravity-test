@@ -146,7 +146,7 @@ async function renderPhotos(data) {
 
   for (const item of photos) {
     const albumContainer = document.createElement('div');
-    albumContainer.className = 'album-container';
+    albumContainer.className = 'album-container collapsed';
     
     const header = document.createElement('div');
     header.className = 'album-header';
