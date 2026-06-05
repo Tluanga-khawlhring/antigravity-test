@@ -252,7 +252,7 @@ ul {
 }
 
 .hero-cross-icon {
-  font-size: 0.5rem;
+  font-size: 5rem;
   color: var(--c-gold);
   text-shadow: 0 0 40px rgba(201, 168, 76, 0.8), 0 0 80px rgba(201, 168, 76, 0.4);
   margin-bottom: 0.5rem;
@@ -1352,6 +1352,10 @@ textarea.form-control {
     font-size: 2.8rem;
   }
 
+  .hero-title {
+    font-size: 2.4rem;
+  }
+
   .hero-sub {
     font-size: 0.95rem;
   }
@@ -1527,6 +1531,10 @@ textarea.form-control {
   .hero-cross-icon {
     font-size: 2.3rem;
     margin-bottom: 1rem;
+  }
+
+  .hero-title {
+    font-size: 1.8rem;
   }
 
   .hero-tagline {
