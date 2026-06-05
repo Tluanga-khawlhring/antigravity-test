@@ -146,6 +146,12 @@ ul {
   text-shadow: 0 0 12px rgba(201, 168, 76, 0.6);
 }
 
+.nav-cross img {
+  height: 28px;
+  width: auto;
+  object-fit: contain;
+}
+
 .nav-links {
   display: flex;
   gap: 0.25rem;
@@ -245,10 +251,10 @@ ul {
 }
 
 .hero-cross-icon {
-  font-size: 3.5rem;
+  font-size: 0.5rem;
   color: var(--c-gold);
   text-shadow: 0 0 40px rgba(201, 168, 76, 0.8), 0 0 80px rgba(201, 168, 76, 0.4);
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
   animation: crossFloat 4s ease-in-out infinite;
 }
 
