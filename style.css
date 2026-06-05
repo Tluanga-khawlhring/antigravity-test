@@ -530,6 +530,20 @@ ul {
   margin-bottom: 1.5rem;
   border-bottom: 1px solid var(--c-border);
   padding-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.album-header:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.album-header-content {
+  flex: 1;
 }
 
 .album-title {
@@ -537,6 +551,23 @@ ul {
   font-size: 1.6rem;
   color: var(--c-white);
   margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.album-toggle-icon {
+  font-size: 1rem;
+  color: var(--c-gold);
+  transition: transform 0.3s ease;
+}
+
+.album-container.collapsed .album-toggle-icon {
+  transform: rotate(-90deg);
+}
+
+.album-container.collapsed .album-photo-grid {
+  display: none;
 }
 
 .album-meta {
@@ -545,6 +576,11 @@ ul {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+  padding-left: 1.5rem;
+}
+
+.album-drive-btn {
+  white-space: nowrap;
 }
 
 .album-photo-grid {

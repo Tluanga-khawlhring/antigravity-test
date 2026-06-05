@@ -151,13 +151,22 @@ async function renderPhotos(data) {
     const header = document.createElement('div');
     header.className = 'album-header';
     header.innerHTML = `
-      <h3 class="album-title">${item.title}</h3>
-      <div class="album-meta">
-        ${formatDate(item.date) ? `<span>📅 ${formatDate(item.date)}</span>` : ''}
-        ${item.description ? `<span>· ${item.description}</span>` : ''}
-        <span>· <a href="${item.url}" target="_blank" style="color:var(--c-gold)">Open in Drive ↗</a></span>
+      <div class="album-header-content">
+        <h3 class="album-title">
+          <span class="album-toggle-icon">▼</span> ${item.title}
+        </h3>
+        <div class="album-meta">
+          ${formatDate(item.date) ? `<span>📅 ${formatDate(item.date)}</span>` : ''}
+          ${item.description ? `<span>· ${item.description}</span>` : ''}
+        </div>
       </div>
+      <a href="${item.url}" target="_blank" class="btn btn-outline btn-sm album-drive-btn" onclick="event.stopPropagation()">Open in Drive ↗</a>
     `;
+    
+    header.addEventListener('click', () => {
+      albumContainer.classList.toggle('collapsed');
+    });
+    
     albumContainer.appendChild(header);
 
     const photoGrid = document.createElement('div');
