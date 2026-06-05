@@ -2,6 +2,12 @@
    SAIKHAMAKAWN CHURCH — GLOBAL STYLES
    ═══════════════════════════════════════════════════════════ */
 
+@font-face { font-family: 'Mizo Synod Serif'; src: url('fonts/Mizo Synod Serif.ttf') format('truetype'); font-weight: normal; font-style: normal; }
+@font-face { font-family: 'Mizo Synod Serif'; src: url('fonts/Mizo Synod Serif Bold.ttf') format('truetype'); font-weight: bold; font-style: normal; }
+@font-face { font-family: 'Mizo Synod Serif'; src: url('fonts/Mizo Synod Serif Italic.ttf') format('truetype'); font-weight: normal; font-style: italic; }
+@font-face { font-family: 'Mizo Synod Serif'; src: url('fonts/Mizo Synod Serif Bold Italic.ttf') format('truetype'); font-weight: bold; font-style: italic; }
+
+
 /* ── TOKENS ─────────────────────────────────────────────────── */
 :root {
   --c-bg:        #0a0c14;
@@ -1716,5 +1722,9 @@ textarea.form-control {
   color: var(--c-gold);
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+
+.mizo-font {
+  font-family: 'Mizo Synod Serif', serif !important;
 }
 .setup-link:hover { opacity: 0.8; }
