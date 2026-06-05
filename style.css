@@ -1504,8 +1504,12 @@ textarea.form-control {
 
   /* Navbar — hide admin text, keep icon feel */
   .nav-brand {
-    font-size: 0.82rem;
-    gap: 7px;
+    gap: 5px;
+  }
+
+  .nav-brand span {
+    font-size: 0.55rem;
+    white-space: nowrap;
   }
 
   .nav-cross {
