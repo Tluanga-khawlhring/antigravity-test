@@ -144,6 +144,7 @@ ul {
   font-size: 1.4rem;
   color: var(--c-gold);
   text-shadow: 0 0 12px rgba(201, 168, 76, 0.6);
+  flex-shrink: 0;
 }
 
 .nav-cross img {
@@ -1506,11 +1507,16 @@ textarea.form-control {
 
   .nav-cross {
     font-size: 1.15rem;
+    flex-shrink: 0;
+  }
+
+  .nav-brand span {
+    white-space: normal;
+    line-height: 1.2;
   }
 
   .nav-admin-btn {
-    padding: 5px 9px;
-    font-size: 0.7rem;
+    display: none;
   }
 
   /* Hero */
