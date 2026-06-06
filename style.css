@@ -574,7 +574,7 @@ ul {
 
 .album-container.collapsed .album-photo-grid,
 .album-container.collapsed .album-footer {
-  display: none;
+  display: none !important;
 }
 
 .album-footer {
@@ -622,6 +622,21 @@ ul {
   .album-header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .album-footer {
+    padding: 1rem 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .album-show-more {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 0.85rem;
+  }
+
+  .album-collapse-btn {
+    width: 100%;
   }
 }
 
