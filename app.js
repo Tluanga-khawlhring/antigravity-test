@@ -108,6 +108,28 @@ function openYouTube(url) {
   window.open(url, '_blank');
 }
 
+/* ─── DRIVE DOWNLOAD ─────────────────────────────────────── */
+async function downloadDrivePhoto(fileId, fileName) {
+  const apiKey = getDriveKey();
+  try {
+    const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${apiKey}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Download failed');
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = fileName || 'photo.jpg';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(blobUrl);
+  } catch(e) {
+    console.warn('Blob download failed, falling back to Drive link:', e.message);
+    window.open(`https://drive.google.com/uc?export=download&id=${fileId}`, '_blank');
+  }
+}
+
 /* ─── LOADER ─────────────────────────────────────────────── */
 function hideLoader() {
   const el = document.getElementById('siteLoader');
@@ -256,9 +278,10 @@ async function renderPhotos(data) {
             
             photoCard.addEventListener('click', () => {
               openLightbox(`
-                <a href="${downloadUrl}" class="lightbox-download" download title="Download Original">
+                <button class="lightbox-download" onclick="downloadDrivePhoto('${f.id}', '${f.name.replace(/'/g, "\\'")}')"
+                  title="Download Original">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                </a>
+                </button>
                 <img src="${imgUrl}" alt="${f.name}" class="lightbox-img">
               `);
             });
