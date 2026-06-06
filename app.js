@@ -72,11 +72,18 @@ async function fetchDriveImages(folderId) {
   const apiKey = getDriveKey();
   if (!apiKey) return [];
   try {
-    const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+mimeType+contains+'image/'&key=${apiKey}&fields=files(id,name,thumbnailLink,webContentLink)&pageSize=100`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('API fetch failed');
-    const data = await res.json();
-    return data.files || [];
+    let allFiles = [];
+    let pageToken = '';
+    do {
+      const tokenParam = pageToken ? `&pageToken=${pageToken}` : '';
+      const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+(mimeType+contains+'image/'+or+mimeType+contains+'video/')&key=${apiKey}&fields=nextPageToken,files(id,name,mimeType,thumbnailLink,webContentLink)&pageSize=1000${tokenParam}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('API fetch failed');
+      const data = await res.json();
+      allFiles = allFiles.concat(data.files || []);
+      pageToken = data.nextPageToken || '';
+    } while (pageToken);
+    return allFiles;
   } catch(e) {
     console.warn('Drive API failed:', e.message);
     return [];
@@ -214,8 +221,8 @@ async function renderPhotos(data) {
     
     const albumFooter = document.createElement('div');
     albumFooter.className = 'album-footer';
-    albumFooter.innerHTML = `<button class="btn btn-outline btn-sm">▲ Collapse Album</button>`;
-    albumFooter.addEventListener('click', () => {
+    albumFooter.innerHTML = `<button class="btn btn-outline btn-sm album-collapse-btn">▲ Collapse Album</button>`;
+    albumFooter.querySelector('.album-collapse-btn').addEventListener('click', () => {
       albumContainer.classList.add('collapsed');
       header.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
@@ -232,20 +239,50 @@ async function renderPhotos(data) {
       photoGrid.innerHTML = '';
       
       if (files.length > 0) {
-        files.forEach(f => {
-          const thumb = f.thumbnailLink ? f.thumbnailLink.replace('=s220', '=w400') : '';
-          const imgUrl = f.thumbnailLink ? f.thumbnailLink.replace('=s220', '=s2000') : f.webContentLink;
-          
-          const photoCard = document.createElement('div');
-          photoCard.className = 'album-photo-card';
-          photoCard.innerHTML = `<img src="${thumb}" alt="${f.name}" loading="lazy">`;
-          
-          photoCard.addEventListener('click', () => {
-            openLightbox(`<img src="${imgUrl}" alt="${f.name}" class="lightbox-img">`);
+        const BATCH = 20;
+        let shown = 0;
+
+        function renderBatch() {
+          const batch = files.slice(shown, shown + BATCH);
+          batch.forEach(f => {
+            // Build URLs directly from file ID — never rely on thumbnailLink format
+            const thumb  = `https://drive.google.com/thumbnail?id=${f.id}&sz=w600`;
+            const imgUrl = `https://drive.google.com/thumbnail?id=${f.id}&sz=w2000`;
+            const downloadUrl = f.webContentLink || `https://drive.google.com/uc?export=download&id=${f.id}`;
+            
+            const photoCard = document.createElement('div');
+            photoCard.className = 'album-photo-card';
+            photoCard.innerHTML = `<img src="${thumb}" alt="${f.name}" loading="lazy">`;
+            
+            photoCard.addEventListener('click', () => {
+              openLightbox(`
+                <a href="${downloadUrl}" class="lightbox-download" download title="Download Original">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                </a>
+                <img src="${imgUrl}" alt="${f.name}" class="lightbox-img">
+              `);
+            });
+            
+            photoGrid.appendChild(photoCard);
           });
-          
-          photoGrid.appendChild(photoCard);
-        });
+          shown += batch.length;
+
+          // Update or hide the "Show More" button
+          if (shown >= files.length) {
+            showMoreBtn.style.display = 'none';
+          } else {
+            showMoreBtn.textContent = `Show More Photos (${files.length - shown} remaining)`;
+            showMoreBtn.style.display = '';
+          }
+        }
+
+        // Create "Show More" button
+        const showMoreBtn = document.createElement('button');
+        showMoreBtn.className = 'btn btn-outline album-show-more';
+        showMoreBtn.addEventListener('click', renderBatch);
+        albumFooter.insertBefore(showMoreBtn, albumFooter.firstChild);
+
+        renderBatch();
       } else {
         photoGrid.innerHTML = `<div class="album-empty">No images found, or folder is private.</div>`;
       }
