@@ -88,6 +88,14 @@ function formatDate(iso) {
   return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
+function sortByDateDesc(arr) {
+  return arr.sort((a, b) => {
+    if (!a.date) return 1;
+    if (!b.date) return -1;
+    return new Date(b.date) - new Date(a.date);
+  });
+}
+
 /* ─── YOUTUBE OPEN ───────────────────────────────────────── */
 function openYouTube(url) {
   window.open(url, '_blank');
@@ -135,7 +143,7 @@ async function renderPhotos(data) {
   const empty = document.getElementById('photosEmpty');
   if (!grid) return;
 
-  const photos = data.photos || [];
+  const photos = sortByDateDesc([...(data.photos || [])]);
   grid.innerHTML = '';
 
   if (photos.length === 0) {
@@ -172,6 +180,15 @@ async function renderPhotos(data) {
     const photoGrid = document.createElement('div');
     photoGrid.className = 'album-photo-grid';
     albumContainer.appendChild(photoGrid);
+    
+    const albumFooter = document.createElement('div');
+    albumFooter.className = 'album-footer';
+    albumFooter.innerHTML = `<button class="btn btn-outline btn-sm">▲ Collapse Album</button>`;
+    albumFooter.addEventListener('click', () => {
+      albumContainer.classList.add('collapsed');
+      header.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    albumContainer.appendChild(albumFooter);
     
     grid.appendChild(albumContainer);
 
@@ -213,7 +230,7 @@ function renderVideos(data) {
   const empty = document.getElementById('videosEmpty');
   if (!grid) return;
 
-  const videos = data.videos || [];
+  const videos = sortByDateDesc([...(data.videos || [])]);
   [...grid.querySelectorAll('.video-card')].forEach(el => el.remove());
 
   if (videos.length === 0) {
@@ -257,7 +274,7 @@ function renderDocs(data) {
   const empty = document.getElementById('docsEmpty');
   if (!grid) return;
 
-  const docs = data.docs || [];
+  const docs = sortByDateDesc([...(data.docs || [])]);
   [...grid.querySelectorAll('.doc-card')].forEach(el => el.remove());
 
   if (docs.length === 0) {
