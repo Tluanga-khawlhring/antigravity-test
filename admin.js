@@ -162,6 +162,22 @@ async function updateDashboard() {
   if (dp) dp.textContent = d.photos?.length || 0;
   if (dv) dv.textContent = d.videos?.length || 0;
   if (dd) dd.textContent = d.docs?.length   || 0;
+
+  const dt = document.getElementById('d-traffic');
+  if (dt) {
+    const url = getFirebaseUrl().replace(/\/$/, '');
+    if (url) {
+      try {
+        const res = await fetch(url + '/traffic.json');
+        if (res.ok) {
+          const traffic = await res.json();
+          dt.textContent = traffic || 0;
+        }
+      } catch {}
+    } else {
+      dt.textContent = 0;
+    }
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════

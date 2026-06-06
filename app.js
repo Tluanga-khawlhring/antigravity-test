@@ -137,6 +137,37 @@ function animateCount(id, target) {
   }, 40);
 }
 
+/* ─── TRAFFIC ────────────────────────────────────────────── */
+async function trackTraffic() {
+  const url = getFirebaseUrl().replace(/\/$/, '');
+  if (!url) return;
+  
+  try {
+    const res = await fetch(url + '/traffic.json');
+    let currentTraffic = 0;
+    if (res.ok) {
+      const data = await res.json();
+      if (data) currentTraffic = parseInt(data, 10);
+    }
+    
+    // Only increment once per browser session
+    if (!sessionStorage.getItem('sk_tracked')) {
+      sessionStorage.setItem('sk_tracked', '1');
+      currentTraffic += 1;
+      
+      await fetch(url + '/traffic.json', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(currentTraffic)
+      });
+    }
+
+    animateCount('statTraffic', currentTraffic);
+  } catch (e) {
+    console.warn('Traffic tracking failed:', e.message);
+  }
+}
+
 /* ─── RENDER PHOTOS ──────────────────────────────────────── */
 async function renderPhotos(data) {
   const grid  = document.getElementById('photosGrid');
@@ -393,6 +424,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Load data (Firebase or local)
     const data = await fetchData();
+    trackTraffic();
 
     renderPhotos(data);
     renderVideos(data);
