@@ -300,22 +300,15 @@ function initNavbar() {
     navLinks.addEventListener('click', () => navLinks.classList.remove('open'));
   }
 
-  const sections = ['home','photos','videos','documents'];
-  const links    = document.querySelectorAll('.nav-link');
+  const links = document.querySelectorAll('.nav-link');
+  const currentPath = window.location.pathname.split('/').pop() || 'index.html';
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        links.forEach(l => l.classList.remove('active'));
-        const match = document.querySelector(`.nav-link[data-section="${entry.target.id}"]`);
-        if (match) match.classList.add('active');
-      }
-    });
-  }, { rootMargin: '-40% 0px -40% 0px' });
-
-  sections.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) observer.observe(el);
+  links.forEach(l => {
+    l.classList.remove('active');
+    const href = l.getAttribute('href');
+    if (href === currentPath || (currentPath === '' && href === 'index.html')) {
+      l.classList.add('active');
+    }
   });
 }
 

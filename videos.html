@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SKK KTP</title>
+  <title>Videos - SKK KTP</title>
   <meta name="description"
     content="Official media library of Kristian Ṭhalai Pawl — browse photos, documents, and sermon videos." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -45,41 +45,25 @@
     </button>
   </nav>
 
-  <!-- ── HERO ─────────────────────────────────────────────────── -->
-  <section class="hero" id="home">
-    <div class="hero-bg-overlay"></div>
-    <div class="particles" id="particles"></div>
-    <div class="hero-content">
-      <div class="hero-cross-icon"><img src="./PinClipart.com_sadi-clipart_495337 (1).png" alt="KTP LOGO"></div>
-      <p class="hero-tagline">Welcome to</p>
-      <h1 class="hero-title">Saikhamakawn<br /><span>Kristian Ṭhalai Pawl</span></h1>
-      <p class="hero-sub">Explore our photo galleries, sermon videos, and documents from our community.</p>
-      <div class="hero-actions">
-        <a href="photos.html" class="btn btn-primary">Browse Gallery</a>
-        <a href="videos.html" class="btn btn-primary">Watch Video</a>
+  <!-- ── VIDEOS SECTION ─────────────────────────────────────────── -->
+  <section class="section section-alt" id="videos" style="min-height: calc(100vh - 200px);">
+    <div class="section-header">
+      <div class="section-badge">🎬 Videos</div>
+      <h2 class="section-title">Youtube</h2>
+      <p class="section-sub">
+        <a href="https://www.youtube.com/@ktpskk" target="_blank" rel="noopener noreferrer"
+          style="color:var(--c-gold);text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:opacity .2s"
+          onmouseover="this.style.opacity='.75'" onmouseout="this.style.opacity='1'">
+          ▶ youtube.com/@ktpskk
+        </a>
+      </p>
+    </div>
+    <div class="card-grid" id="videosGrid">
+      <div class="empty-state" id="videosEmpty">
+        <div class="empty-icon">🎥</div>
+        <p>No videos yet.</p>
+        <span>Add YouTube links from the Admin panel.</span>
       </div>
-    </div>
-    <div class="hero-scroll-hint">
-      <div class="scroll-icon"></div>
-      <span>Scroll to explore</span>
-    </div>
-  </section>
-
-  <!-- ── STATS BAR ─────────────────────────────────────────────── -->
-  <section class="stats-bar" id="statsBar">
-    <div class="stat-item">
-      <span class="stat-number" id="statPhotos">0</span>
-      <span class="stat-label">Photo Albums</span>
-    </div>
-    <div class="stat-divider"></div>
-    <div class="stat-item">
-      <span class="stat-number" id="statVideos">0</span>
-      <span class="stat-label">Videos</span>
-    </div>
-    <div class="stat-divider"></div>
-    <div class="stat-item">
-      <span class="stat-number" id="statDocs">0</span>
-      <span class="stat-label">Documents</span>
     </div>
   </section>
 
