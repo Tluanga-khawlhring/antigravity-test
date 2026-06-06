@@ -262,7 +262,7 @@ ul {
   height: 10rem;
   width: auto;
   object-fit: contain;
-  filter: drop-shadow(0 0 20px rgba(201, 168, 76, 0.6));
+  filter: drop-shadow(0 0 20px rgba(140, 217, 247, 0.3));
 }
 
 @keyframes crossFloat {
@@ -572,8 +572,16 @@ ul {
   transform: rotate(-90deg);
 }
 
-.album-container.collapsed .album-photo-grid {
+.album-container.collapsed .album-photo-grid,
+.album-container.collapsed .album-footer {
   display: none;
+}
+
+.album-footer {
+  margin-top: 1.5rem;
+  text-align: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--c-border);
 }
 
 .album-meta {
