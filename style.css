@@ -573,6 +573,14 @@ ul {
   transform: rotate(-90deg);
 }
 
+.album-container.collapsed {
+  margin-bottom: 0.5rem;
+}
+
+.album-container.collapsed .album-header {
+  margin-bottom: 0;
+}
+
 .album-container.collapsed .album-photo-grid,
 .album-container.collapsed .album-footer {
   display: none;
