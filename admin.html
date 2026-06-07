@@ -45,7 +45,7 @@
     </div>
     <div style="display:flex;gap:0.75rem;align-items:center;">
       <a href="index.html" class="btn btn-outline btn-sm">← View Site</a>
-      <button class="btn btn-danger btn-sm" id="clearAllBtn" title="Reset all data">🗑 Clear All</button>
+
     </div>
   </header>
 
@@ -160,7 +160,10 @@
           <button class="btn btn-primary" id="addPhotoBtn">Add Album</button>
         </div>
 
-        <div class="admin-form-title" style="margin-bottom:1rem;">📋 All Albums (<span id="photo-count">0</span>)</div>
+        <div class="admin-form-title" style="margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center;">
+          <span>📋 All Albums (<span id="photo-count">0</span>)</span>
+          <button class="btn btn-danger btn-sm" id="clearPhotosBtn" style="font-size:0.75rem; padding:0.2rem 0.5rem">🗑 Clear Albums</button>
+        </div>
         <div class="admin-list" id="photosList">
           <div class="admin-empty-list">No albums yet.</div>
         </div>
@@ -200,7 +203,10 @@
           <button class="btn btn-primary" id="addVideoBtn">Add Video</button>
         </div>
 
-        <div class="admin-form-title" style="margin-bottom:1rem;">📋 All Videos (<span id="video-count">0</span>)</div>
+        <div class="admin-form-title" style="margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center;">
+          <span>📋 All Videos (<span id="video-count">0</span>)</span>
+          <button class="btn btn-danger btn-sm" id="clearVideosBtn" style="font-size:0.75rem; padding:0.2rem 0.5rem">🗑 Clear Videos</button>
+        </div>
         <div class="admin-list" id="videosList">
           <div class="admin-empty-list">No videos yet.</div>
         </div>
@@ -248,7 +254,41 @@
           <button class="btn btn-primary" id="addDocBtn">Add Document</button>
         </div>
 
-        <div class="admin-form-title" style="margin-bottom:1rem;">📋 All Documents (<span id="doc-count">0</span>)</div>
+        <div class="admin-form" style="margin-top:1.5rem">
+          <div class="admin-form-title">📁 Bulk Add from Folder</div>
+          
+          <div class="form-group">
+            <label class="form-label" for="doc-bulk-url">Google Drive Folder URL *</label>
+            <input type="url" class="form-control" id="doc-bulk-url" placeholder="https://drive.google.com/drive/folders/..." />
+            <p class="form-hint">Fetches all files in this folder. Requires Google Drive API Key in Settings.</p>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="doc-bulk-category">Default Category</label>
+              <select class="form-control" id="doc-bulk-category">
+                <option value="">Select category…</option>
+                <option value="Bulletin">Weekly Bulletin</option>
+                <option value="Sermon Notes">Sermon Notes</option>
+                <option value="Announcement">Announcement</option>
+                <option value="Report">Annual Report</option>
+                <option value="Forms">Forms</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="doc-bulk-date">Date for all</label>
+              <input type="date" class="form-control" id="doc-bulk-date" />
+            </div>
+          </div>
+
+          <button class="btn btn-outline" id="addDocBulkBtn">Bulk Add Documents</button>
+        </div>
+
+        <div class="admin-form-title" style="margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center;">
+          <span>📋 All Documents (<span id="doc-count">0</span>)</span>
+          <button class="btn btn-danger btn-sm" id="clearDocsBtn" style="font-size:0.75rem; padding:0.2rem 0.5rem">🗑 Clear Documents</button>
+        </div>
         <div class="admin-list" id="docsList">
           <div class="admin-empty-list">No documents yet.</div>
         </div>
@@ -284,7 +324,29 @@
           <button class="btn btn-primary" id="addLyricBtn">Add Lyrics</button>
         </div>
 
-        <div class="admin-form-title" style="margin-bottom:1rem;">📋 All Lyrics (<span id="lyric-count">0</span>)</div>
+        <div class="admin-form" style="margin-top:1.5rem">
+          <div class="admin-form-title">📁 Bulk Add from Folder</div>
+          
+          <div class="form-group">
+            <label class="form-label" for="lyric-bulk-url">Google Drive Folder URL *</label>
+            <input type="url" class="form-control" id="lyric-bulk-url" placeholder="https://drive.google.com/drive/folders/..." />
+            <p class="form-hint">Fetches all files in this folder. Requires Google Drive API Key in Settings.</p>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="lyric-bulk-date">Date for all</label>
+              <input type="date" class="form-control" id="lyric-bulk-date" />
+            </div>
+          </div>
+
+          <button class="btn btn-outline" id="addLyricBulkBtn">Bulk Add Lyrics</button>
+        </div>
+
+        <div class="admin-form-title" style="margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center;">
+          <span>📋 All Lyrics (<span id="lyric-count">0</span>)</span>
+          <button class="btn btn-danger btn-sm" id="clearLyricsBtn" style="font-size:0.75rem; padding:0.2rem 0.5rem">🗑 Clear Lyrics</button>
+        </div>
         <div class="admin-list" id="lyricsList">
           <div class="admin-empty-list">No lyrics yet.</div>
         </div>

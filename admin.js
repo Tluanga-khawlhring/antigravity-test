@@ -126,6 +126,50 @@ function escHtml(str) {
     .replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+async function fetchDriveFolderFiles(folderUrl) {
+  const apiKey = getDriveKey();
+  if (!apiKey) {
+    throw new Error('Google Drive API Key is missing. Please set it in Settings.');
+  }
+
+  let folderId = null;
+  const match = folderUrl.match(/\/folders\/([a-zA-Z0-9_-]+)/);
+  if (match) folderId = match[1];
+  else {
+    try {
+      const params = new URLSearchParams(folderUrl.split('?')[1]);
+      folderId = params.get('id');
+    } catch (e) {}
+  }
+
+  if (!folderId) {
+    throw new Error('Could not extract Folder ID from the URL.');
+  }
+
+  const query = encodeURIComponent(`'${folderId}' in parents and trashed = false`);
+  let allFiles = [];
+  let pageToken = '';
+
+  do {
+    const tokenParam = pageToken ? `&pageToken=${pageToken}` : '';
+    const url = `https://www.googleapis.com/drive/v3/files?q=${query}&key=${apiKey}&fields=nextPageToken,files(id,name,mimeType)&pageSize=1000${tokenParam}`;
+    
+    const res = await fetch(url);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || 'Failed to fetch from Google Drive');
+    }
+    
+    const data = await res.json();
+    if (data.files) {
+      allFiles = allFiles.concat(data.files);
+    }
+    pageToken = data.nextPageToken;
+  } while (pageToken);
+
+  return allFiles;
+}
+
 /* ─── TOAST ──────────────────────────────────────────────── */
 function toast(msg, type = 'success') {
   const c = document.getElementById('toastContainer');
@@ -513,6 +557,47 @@ async function addDoc() {
   finally { btn.disabled = false; btn.textContent = 'Add Document'; }
 }
 
+async function addDocBulk() {
+  const url = document.getElementById('doc-bulk-url').value.trim();
+  const category = document.getElementById('doc-bulk-category').value;
+  const date = document.getElementById('doc-bulk-date').value;
+
+  if (!url) { toast('Please enter a Google Drive folder URL.','error'); return; }
+
+  const btn = document.getElementById('addDocBulkBtn');
+  btn.disabled = true; btn.textContent = 'Fetching…';
+
+  try {
+    const files = await fetchDriveFolderFiles(url);
+    if (files.length === 0) {
+      toast('No files found in this folder.', 'error');
+      return;
+    }
+
+    const data = await loadData();
+    let addedCount = 0;
+
+    files.forEach(f => {
+      const fileUrl = `https://drive.google.com/file/d/${f.id}/view`;
+      const title = f.name.replace(/\.[^/.]+$/, "");
+      data.docs.unshift({ id: uid(), title, url: fileUrl, category, date });
+      addedCount++;
+    });
+
+    const synced = await saveData(data);
+    
+    ['doc-bulk-url','doc-bulk-date'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('doc-bulk-category').value='';
+    await renderDocsList();
+    updateDashboard();
+    toast(`${addedCount} documents added!${!synced && getFirebaseUrl() ? ' (saved locally — Firebase sync pending)' : ''}`);
+  } catch (e) {
+    toast(e.message, 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Bulk Add Documents';
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════
    LYRICS
    ═══════════════════════════════════════════════════════════ */
@@ -566,6 +651,45 @@ async function addLyric() {
     toast(`Lyric "${title}" added!${!synced && getFirebaseUrl() ? ' (saved locally — Firebase sync pending)' : ''}`);
   } catch(e) { toast('Failed to save: ' + e.message, 'error'); }
   finally { btn.disabled = false; btn.textContent = 'Add Lyrics'; }
+}
+
+async function addLyricBulk() {
+  const url = document.getElementById('lyric-bulk-url').value.trim();
+  const date = document.getElementById('lyric-bulk-date').value;
+
+  if (!url) { toast('Please enter a Google Drive folder URL.','error'); return; }
+
+  const btn = document.getElementById('addLyricBulkBtn');
+  btn.disabled = true; btn.textContent = 'Fetching…';
+
+  try {
+    const files = await fetchDriveFolderFiles(url);
+    if (files.length === 0) {
+      toast('No files found in this folder.', 'error');
+      return;
+    }
+
+    const data = await loadData();
+    let addedCount = 0;
+
+    files.forEach(f => {
+      const fileUrl = `https://drive.google.com/file/d/${f.id}/view`;
+      const title = f.name.replace(/\.[^/.]+$/, "");
+      data.lyrics.unshift({ id: uid(), title, url: fileUrl, date });
+      addedCount++;
+    });
+
+    const synced = await saveData(data);
+    
+    ['lyric-bulk-url','lyric-bulk-date'].forEach(id => document.getElementById(id).value='');
+    await renderLyricsList();
+    updateDashboard();
+    toast(`${addedCount} lyrics added!${!synced && getFirebaseUrl() ? ' (saved locally — Firebase sync pending)' : ''}`);
+  } catch (e) {
+    toast(e.message, 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Bulk Add Lyrics';
+  }
 }
 
 /* ─── GLOBAL EDIT / DELETE ───────────────────────────────── */
@@ -679,19 +803,27 @@ async function initSettingsPanel() {
   };
 }
 
-/* ─── CLEAR ALL ──────────────────────────────────────────── */
-function initClearAll() {
-  document.getElementById('clearAllBtn')?.addEventListener('click', async () => {
-    if (!confirm('⚠️ This will permanently delete ALL content. Continue?')) return;
-    try {
-      await saveData({ photos: [], videos: [], docs: [], lyrics: [] });
-      await renderPhotosList();
-      await renderVideosList();
-      await renderDocsList();
-      await renderLyricsList();
-      updateDashboard();
-      toast('All data cleared.');
-    } catch(e) { toast('Clear failed: ' + e.message, 'error'); }
+/* ─── CLEAR SECTIONS ─────────────────────────────────────── */
+function initClearSections() {
+  const types = [
+    { btn: 'clearPhotosBtn', type: 'photos', name: 'Albums', render: renderPhotosList },
+    { btn: 'clearVideosBtn', type: 'videos', name: 'Videos', render: renderVideosList },
+    { btn: 'clearDocsBtn', type: 'docs', name: 'Documents', render: renderDocsList },
+    { btn: 'clearLyricsBtn', type: 'lyrics', name: 'Lyrics', render: renderLyricsList }
+  ];
+
+  types.forEach(({ btn, type, name, render }) => {
+    document.getElementById(btn)?.addEventListener('click', async () => {
+      if (!confirm(`⚠️ This will permanently delete ALL ${name}. Continue?`)) return;
+      try {
+        const data = await loadData();
+        data[type] = [];
+        await saveData(data);
+        await render();
+        updateDashboard();
+        toast(`All ${name} cleared.`);
+      } catch(e) { toast(`Clear failed: ` + e.message, 'error'); }
+    });
   });
 }
 
@@ -699,7 +831,7 @@ function initClearAll() {
 document.addEventListener('DOMContentLoaded', async () => {
   initSidebar();
   initEditModal();
-  initClearAll();
+  initClearSections();
   await updateDashboard();
   await renderPhotosList();
   await renderVideosList();
@@ -709,7 +841,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('addPhotoBtn')?.addEventListener('click', addPhoto);
   document.getElementById('addVideoBtn')?.addEventListener('click', addVideo);
   document.getElementById('addDocBtn')  ?.addEventListener('click', addDoc);
+  document.getElementById('addDocBulkBtn')?.addEventListener('click', addDocBulk);
   document.getElementById('addLyricBtn')?.addEventListener('click', addLyric);
+  document.getElementById('addLyricBulkBtn')?.addEventListener('click', addLyricBulk);
 
   document.addEventListener('keydown', e => {
     if (e.key !== 'Enter') return;
