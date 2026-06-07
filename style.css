@@ -1072,9 +1072,10 @@ ul {
   position: absolute;
   top: 1.5rem;
   right: 5.5rem;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
   border: 1px solid var(--c-border);
-  color: var(--c-text);
+  color: var(--c-white);
   width: 44px;
   height: 44px;
   border-radius: 50%;
