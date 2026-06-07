@@ -219,9 +219,8 @@ ul {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   text-align: center;
-  padding: 100px 2rem 60px;
+  padding: 120px 2rem 60px;
   overflow: hidden;
   background:
     radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201, 168, 76, 0.12) 0%, transparent 65%),
@@ -249,6 +248,7 @@ ul {
   position: relative;
   z-index: 2;
   max-width: 720px;
+  margin: auto 0;
 }
 
 .hero-cross-icon {
@@ -329,6 +329,7 @@ ul {
   align-items: center;
   gap: 8px;
   letter-spacing: 0.02em;
+  margin-bottom: 0.2rem;
 }
 
 .btn-primary {
@@ -574,7 +575,7 @@ ul {
 
 .album-container.collapsed .album-photo-grid,
 .album-container.collapsed .album-footer {
-  display: none !important;
+  display: none;
 }
 
 .album-footer {
@@ -582,16 +583,6 @@ ul {
   text-align: center;
   padding-top: 1.5rem;
   border-top: 1px solid var(--c-border);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.album-show-more {
-  padding: 10px 28px;
-  font-size: 0.88rem;
-  letter-spacing: 0.04em;
 }
 
 .album-meta {
@@ -609,34 +600,19 @@ ul {
 
 .album-photo-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
 }
 
 @media (max-width: 768px) {
   .album-photo-grid {
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    gap: 0.35rem;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 0.5rem;
   }
 
   .album-header {
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  .album-footer {
-    padding: 1rem 0.5rem;
-    gap: 0.5rem;
-  }
-
-  .album-show-more {
-    width: 100%;
-    padding: 12px 16px;
-    font-size: 0.85rem;
-  }
-
-  .album-collapse-btn {
-    width: 100%;
   }
 }
 
@@ -1015,57 +991,16 @@ ul {
   color: var(--c-white);
 }
 
-.lightbox-download {
-  position: absolute;
-  top: 1.5rem;
-  right: 5rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid var(--c-border);
-  color: var(--c-text);
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: var(--transition);
-  text-decoration: none;
-}
-
-.lightbox-download:hover {
-  background: rgba(255, 255, 255, 0.2);
-  color: var(--c-white);
-}
-
-.lightbox-download svg {
-  width: 20px;
-  height: 20px;
-}
-
 .lightbox-body {
   width: 100%;
   max-width: 900px;
   max-height: 90vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: auto;
 }
 
 .lightbox-body iframe {
   width: 100%;
   aspect-ratio: 16/9;
   border: none;
-  border-radius: var(--radius-md);
-}
-
-.lightbox-img {
-  max-width: 100%;
-  max-height: 90vh;
-  object-fit: contain;
-  display: block;
-  margin: 0 auto;
   border-radius: var(--radius-md);
 }
 
@@ -1510,18 +1445,7 @@ textarea.form-control {
   .hero-actions {
     flex-direction: column;
     align-items: center;
-    gap: 5rem !important;
-  }
-
-  .hero-actions .btn {
-    width: 100%;
-    max-width: 280px;
-    justify-content: center;
-    margin-bottom: 5rem !important;
-  }
-
-  .hero-actions .btn:last-child {
-    margin-bottom: 0 !important;
+    gap: 0.75rem;
   }
 
   .btn {
@@ -1692,7 +1616,7 @@ textarea.form-control {
     justify-content: center;
     color: transparent;
   }
-  
+
   .nav-admin-btn::before {
     content: "⚙";
     font-size: 1rem;
@@ -1806,7 +1730,7 @@ textarea.form-control {
     font-size: 0.85rem;
     margin-bottom: 0.25rem;
   }
-  
+
   .video-card-meta {
     flex-direction: column;
     align-items: flex-start;
