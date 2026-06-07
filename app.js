@@ -152,7 +152,12 @@ async function downloadDrivePhoto(fileId, fileName) {
     URL.revokeObjectURL(blobUrl);
   } catch(e) {
     console.warn('Blob download failed, falling back to Drive link:', e.message);
-    window.open(`https://drive.google.com/uc?export=download&id=${fileId}`, '_blank');
+    const a = document.createElement('a');
+    a.href = `https://drive.google.com/uc?export=download&id=${fileId}`;
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   }
 }
 
@@ -306,12 +311,13 @@ async function renderPhotos(data) {
                 photoCard.innerHTML = `<img src="${thumb}" alt="${f.name}" loading="lazy">`;
                 
                 photoCard.addEventListener('click', () => {
+                  const safeName = f.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
                   openLightbox(`
-                    <button class="lightbox-download" onclick="downloadDrivePhoto('${f.id}', '${f.name.replace(/'/g, "\\'")}')"
+                    <button class="lightbox-download" onclick="downloadDrivePhoto('${f.id}', '${safeName}')"
                       title="Download Original">
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                     </button>
-                    <img src="${imgUrl}" alt="${f.name}" class="lightbox-img">
+                    <img src="${imgUrl}" alt="${safeName}" class="lightbox-img">
                   `);
                 });
                 
