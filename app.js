@@ -75,15 +75,16 @@ function getDriveFileId(url) {
   return m2 ? m2[1] : null;
 }
 
-function openDocumentPreview(e, url) {
+function openDocumentPreview(e, url, title = 'document.pdf') {
   e.preventDefault();
   const fileId = getDriveFileId(url);
   if (fileId) {
+    const safeName = title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
     const previewUrl = `https://drive.google.com/file/d/${fileId}/preview`;
     openLightbox(`
-      <a href="https://drive.google.com/uc?export=download&id=${fileId}" target="_blank" class="lightbox-download" title="Download Document">
+      <button onclick="downloadDrivePhoto('${fileId}', '${safeName}')" class="lightbox-download" title="Download Document">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-      </a>
+      </button>
       <iframe src="${previewUrl}" class="doc-preview" allow="autoplay"></iframe>
     `);
   } else {
@@ -413,7 +414,7 @@ function renderDocs(data) {
     const card = document.createElement('a');
     card.className = 'doc-card';
     card.href = item.url;
-    card.onclick = (e) => openDocumentPreview(e, item.url);
+    card.onclick = (e) => openDocumentPreview(e, item.url, item.title + '.pdf');
     card.target = '_blank';
     card.rel = 'noopener noreferrer';
     card.innerHTML = `
@@ -446,7 +447,7 @@ function renderLyrics(data) {
     const card = document.createElement('a');
     card.className = 'doc-card';
     card.href = item.url;
-    card.onclick = (e) => openDocumentPreview(e, item.url);
+    card.onclick = (e) => openDocumentPreview(e, item.url, item.title + '.pdf');
     card.target = '_blank';
     card.rel = 'noopener noreferrer';
     card.innerHTML = `
