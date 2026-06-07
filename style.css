@@ -1099,9 +1099,11 @@ ul {
 
 .lightbox-body iframe {
   width: 100%;
-  aspect-ratio: 16/9;
+  height: calc(100vh - 140px);
+  margin-top: 80px;
   border: none;
   border-radius: var(--radius-md);
+  background: var(--c-surface);
 }
 
 /* ═══════════════════════════════════════════════════════════
