@@ -787,20 +787,22 @@ ul {
 /* ── DOC GRID ────────────────────────────────────────────────── */
 .doc-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
 }
 
 .doc-card {
   background: var(--c-surface);
   border: 1px solid var(--c-border);
   border-radius: var(--radius-md);
-  padding: 1.2rem 1.4rem;
+  padding: 0.8rem 1.2rem;
   display: flex;
   align-items: center;
   gap: 1rem;
   transition: var(--transition);
-  cursor: default;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
 }
 
 .doc-card:hover {
@@ -810,15 +812,15 @@ ul {
 }
 
 .doc-icon {
-  width: 48px;
-  height: 48px;
+  width: 32px;
+  height: 32px;
   border-radius: var(--radius-sm);
   background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.08));
   border: 1px solid rgba(239, 68, 68, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.4rem;
+  font-size: 1rem;
   flex-shrink: 0;
 }
 
@@ -829,16 +831,16 @@ ul {
 
 .doc-title {
   font-weight: 600;
-  font-size: 0.92rem;
+  font-size: 0.88rem;
   color: var(--c-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-bottom: 3px;
+  margin-bottom: 2px;
 }
 
 .doc-meta {
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   color: var(--c-text-sub);
 }
 

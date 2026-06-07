@@ -68,6 +68,32 @@ function getFolderId(url) {
   return m2 ? m2[1] : null;
 }
 
+function getDriveFileId(url) {
+  const m1 = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (m1) return m1[1];
+  const m2 = url.match(/id=([a-zA-Z0-9_-]+)/);
+  return m2 ? m2[1] : null;
+}
+
+function openDocumentPreview(e, url) {
+  e.preventDefault();
+  const fileId = getDriveFileId(url);
+  if (fileId) {
+    const previewUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+    openLightbox(`
+      <div style="text-align: right; margin-bottom: 8px;">
+        <a href="https://drive.google.com/uc?export=download&id=${fileId}" target="_blank" class="btn btn-sm btn-outline" style="display: inline-flex; align-items: center; gap: 6px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Download
+        </a>
+      </div>
+      <iframe src="${previewUrl}" class="doc-preview" allow="autoplay" style="width: 100%; height: 80vh; aspect-ratio: auto; border: none; border-radius: var(--radius-md); background: var(--c-surface);"></iframe>
+    `);
+  } else {
+    window.open(url, '_blank');
+  }
+}
+
 async function fetchDriveImages(folderId) {
   const apiKey = getDriveKey();
   if (!apiKey) return [];
@@ -381,16 +407,17 @@ function renderDocs(data) {
   if (empty) empty.style.display = 'none';
 
   docs.forEach(item => {
-    const card = document.createElement('div');
+    const card = document.createElement('a');
     card.className = 'doc-card';
+    card.href = item.url;
+    card.onclick = (e) => openDocumentPreview(e, item.url);
+    card.target = '_blank';
+    card.rel = 'noopener noreferrer';
     card.innerHTML = `
       <div class="doc-icon">📄</div>
       <div class="doc-info">
         <div class="doc-title">${item.title}</div>
         <div class="doc-meta">${item.category || 'Document'} · ${formatDate(item.date) || ''}</div>
-      </div>
-      <div class="doc-actions">
-        <a href="${item.url}" target="_blank" class="btn btn-sm btn-outline">Open</a>
       </div>
     `;
     grid.appendChild(card);
@@ -413,16 +440,17 @@ function renderLyrics(data) {
   if (empty) empty.style.display = 'none';
 
   lyrics.forEach(item => {
-    const card = document.createElement('div');
+    const card = document.createElement('a');
     card.className = 'doc-card';
+    card.href = item.url;
+    card.onclick = (e) => openDocumentPreview(e, item.url);
+    card.target = '_blank';
+    card.rel = 'noopener noreferrer';
     card.innerHTML = `
       <div class="doc-icon">🎵</div>
       <div class="doc-info">
         <div class="doc-title">${item.title}</div>
         <div class="doc-meta">${formatDate(item.date) || ''}</div>
-      </div>
-      <div class="doc-actions">
-        <a href="${item.url}" target="_blank" class="btn btn-sm btn-outline">Open</a>
       </div>
     `;
     grid.appendChild(card);
