@@ -827,6 +827,27 @@ function initClearSections() {
   });
 }
 
+/* ─── SCROLL ANIMATIONS ──────────────────────────────────── */
+function initScrollAnimations() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+
+  const targets = document.querySelectorAll('.admin-panel-title, .admin-panel-sub, .stat-card, .admin-form, .admin-list-item');
+  
+  targets.forEach(el => {
+    if (!el.classList.contains('fade-in-up')) {
+      el.classList.add('fade-in-up');
+    }
+    observer.observe(el);
+  });
+}
+
 /* ─── INIT ───────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', async () => {
   initSidebar();
@@ -837,6 +858,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   await renderVideosList();
   await renderDocsList();
   await renderLyricsList();
+  
+  initScrollAnimations();
 
   document.getElementById('addPhotoBtn')?.addEventListener('click', addPhoto);
   document.getElementById('addVideoBtn')?.addEventListener('click', addVideo);

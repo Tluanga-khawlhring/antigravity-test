@@ -533,6 +533,25 @@ function closeLightbox() {
   document.body.style.overflow = '';
 }
 
+/* ─── SCROLL ANIMATIONS ──────────────────────────────────── */
+function initScrollAnimations() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+
+  const targets = document.querySelectorAll('.section-header, .stat-item, .album-container, .video-card, .doc-card, .empty-state, .hero-content > *');
+  
+  targets.forEach(el => {
+    el.classList.add('fade-in-up');
+    observer.observe(el);
+  });
+}
+
 /* ─── INIT ───────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', async () => {
   try {
@@ -563,6 +582,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderDocs(data);
     renderLyrics(data);
     updateStats(data);
+    
+    initScrollAnimations();
   } catch(e) {
     console.error('Site init error:', e);
   } finally {
