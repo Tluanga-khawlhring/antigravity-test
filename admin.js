@@ -62,14 +62,15 @@ function normalizeData(d) {
   return {
     photos: Array.isArray(d?.photos) ? d.photos : [],
     videos: Array.isArray(d?.videos) ? d.videos : [],
-    docs:   Array.isArray(d?.docs)   ? d.docs   : []
+    docs:   Array.isArray(d?.docs)   ? d.docs   : [],
+    lyrics: Array.isArray(d?.lyrics) ? d.lyrics : []
   };
 }
 
 function localLoad() {
   try {
     return normalizeData(JSON.parse(localStorage.getItem(STORE_KEY)));
-  } catch { return { photos: [], videos: [], docs: [] }; }
+  } catch { return { photos: [], videos: [], docs: [], lyrics: [] }; }
 }
 
 async function loadData() {
@@ -159,9 +160,11 @@ async function updateDashboard() {
   const dp = document.getElementById('d-photos');
   const dv = document.getElementById('d-videos');
   const dd = document.getElementById('d-docs');
+  const dl = document.getElementById('d-lyrics');
   if (dp) dp.textContent = d.photos?.length || 0;
   if (dv) dv.textContent = d.videos?.length || 0;
   if (dd) dd.textContent = d.docs?.length   || 0;
+  if (dl) dl.textContent = d.lyrics?.length || 0;
 
   const dt = document.getElementById('d-traffic');
   if (dt) {
@@ -229,7 +232,7 @@ function openEditModal(type, id, item) {
         <label class="form-label">Date</label>
         <input type="date" class="form-control" id="edit-date" value="${item.date||''}" />
       </div>`;
-  } else {
+  } else if (type === 'docs') {
     const cats = ['Bulletin','Sermon Notes','Announcement','Report','Forms','Other'];
     const opts = cats.map(c =>
       `<option value="${c}" ${item.category===c?'selected':''}>${c==='Bulletin'?'Weekly Bulletin':c==='Report'?'Annual Report':c}</option>`
@@ -249,6 +252,21 @@ function openEditModal(type, id, item) {
         <select class="form-control" id="edit-category">
           <option value="">Select…</option>${opts}
         </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date</label>
+        <input type="date" class="form-control" id="edit-date" value="${item.date||''}" />
+      </div>`;
+  } else if (type === 'lyrics') {
+    title.innerHTML = '✏️ Edit Lyrics';
+    body.innerHTML = `
+      <div class="form-group">
+        <label class="form-label">Song Title *</label>
+        <input type="text" class="form-control" id="edit-title" value="${escHtml(item.title)}" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Google Drive File URL *</label>
+        <input type="url" class="form-control" id="edit-url" value="${escHtml(item.url)}" />
       </div>
       <div class="form-group">
         <label class="form-label">Date</label>
@@ -275,7 +293,7 @@ async function saveEdit() {
 
   if (!newTitle) { toast('Title cannot be empty.', 'error'); return; }
   if (!newUrl)   { toast('URL cannot be empty.', 'error'); return; }
-  if ((type==='photos'||type==='docs') && !newUrl.includes('drive.google.com')) {
+  if ((type==='photos'||type==='docs'||type==='lyrics') && !newUrl.includes('drive.google.com')) {
     toast('URL must be a Google Drive link.', 'error'); return;
   }
   if (type==='videos' && !newUrl.includes('youtube') && !newUrl.includes('youtu.be')) {
@@ -302,6 +320,7 @@ async function saveEdit() {
     if (type==='photos')  await renderPhotosList();
     if (type==='videos')  await renderVideosList();
     if (type==='docs')    await renderDocsList();
+    if (type==='lyrics')  await renderLyricsList();
     updateDashboard();
     toast(`"${newTitle}" updated!`);
   } catch(e) {
@@ -494,6 +513,61 @@ async function addDoc() {
   finally { btn.disabled = false; btn.textContent = 'Add Document'; }
 }
 
+/* ═══════════════════════════════════════════════════════════
+   LYRICS
+   ═══════════════════════════════════════════════════════════ */
+async function renderLyricsList() {
+  const list = document.getElementById('lyricsList');
+  const cnt  = document.getElementById('lyric-count');
+  if (!list) return;
+  list.innerHTML = '<div class="admin-empty-list" style="opacity:.5">Loading…</div>';
+
+  const { lyrics = [] } = await loadData();
+  if (cnt) cnt.textContent = lyrics.length;
+
+  if (lyrics.length === 0) {
+    list.innerHTML = '<div class="admin-empty-list">No lyrics yet. Add your first lyric above.</div>';
+    return;
+  }
+  list.innerHTML = lyrics.map(item => `
+    <div class="admin-list-item">
+      <div class="admin-list-icon">🎵</div>
+      <div class="admin-list-info">
+        <div class="admin-list-name">${escHtml(item.title)}</div>
+        <div class="admin-list-meta">${formatDate(item.date)||'No date'}</div>
+        <div class="admin-list-meta" style="margin-top:2px">
+          <a href="${item.url}" target="_blank" style="color:var(--c-gold);opacity:.85">Open Drive File ↗</a></div>
+      </div>
+      <div class="admin-list-actions">
+        <button class="btn btn-edit btn-sm" onclick="editItem('lyrics','${item.id}')">✏️ Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteItem('lyrics','${item.id}')">Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+async function addLyric() {
+  const title    = document.getElementById('lyric-title').value.trim();
+  const url      = document.getElementById('lyric-url').value.trim();
+  const date     = document.getElementById('lyric-date').value;
+
+  if (!title) { toast('Please enter a song title.','error'); return; }
+  if (!url)   { toast('Please enter a Google Drive file URL.','error'); return; }
+  if (!url.includes('drive.google.com')) { toast('URL must be a Google Drive link.','error'); return; }
+
+  const btn = document.getElementById('addLyricBtn');
+  btn.disabled = true; btn.textContent = 'Adding…';
+  try {
+    const data = await loadData();
+    data.lyrics.unshift({ id: uid(), title, url, date });
+    const synced = await saveData(data);
+    ['lyric-title','lyric-url','lyric-date'].forEach(id => document.getElementById(id).value='');
+    await renderLyricsList();
+    updateDashboard();
+    toast(`Lyric "${title}" added!${!synced && getFirebaseUrl() ? ' (saved locally — Firebase sync pending)' : ''}`);
+  } catch(e) { toast('Failed to save: ' + e.message, 'error'); }
+  finally { btn.disabled = false; btn.textContent = 'Add Lyrics'; }
+}
+
 /* ─── GLOBAL EDIT / DELETE ───────────────────────────────── */
 window.editItem = async function(type, id) {
   const data = await loadData();
@@ -510,6 +584,7 @@ window.deleteItem = async function(type, id) {
     if (type==='photos') await renderPhotosList();
     if (type==='videos') await renderVideosList();
     if (type==='docs')   await renderDocsList();
+    if (type==='lyrics') await renderLyricsList();
     updateDashboard();
     toast('Item deleted.');
   } catch(e) { toast('Delete failed: ' + e.message, 'error'); }
@@ -609,10 +684,11 @@ function initClearAll() {
   document.getElementById('clearAllBtn')?.addEventListener('click', async () => {
     if (!confirm('⚠️ This will permanently delete ALL content. Continue?')) return;
     try {
-      await saveData({ photos: [], videos: [], docs: [] });
+      await saveData({ photos: [], videos: [], docs: [], lyrics: [] });
       await renderPhotosList();
       await renderVideosList();
       await renderDocsList();
+      await renderLyricsList();
       updateDashboard();
       toast('All data cleared.');
     } catch(e) { toast('Clear failed: ' + e.message, 'error'); }
@@ -628,10 +704,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   await renderPhotosList();
   await renderVideosList();
   await renderDocsList();
+  await renderLyricsList();
 
   document.getElementById('addPhotoBtn')?.addEventListener('click', addPhoto);
   document.getElementById('addVideoBtn')?.addEventListener('click', addVideo);
   document.getElementById('addDocBtn')  ?.addEventListener('click', addDoc);
+  document.getElementById('addLyricBtn')?.addEventListener('click', addLyric);
 
   document.addEventListener('keydown', e => {
     if (e.key !== 'Enter') return;
@@ -641,5 +719,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (active.id === 'panel-photos')    addPhoto();
     if (active.id === 'panel-videos')    addVideo();
     if (active.id === 'panel-documents') addDoc();
+    if (active.id === 'panel-lyrics')    addLyric();
   });
 });

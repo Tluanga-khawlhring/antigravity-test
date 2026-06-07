@@ -68,6 +68,9 @@
       <button class="sidebar-btn" data-panel="documents" id="sb-documents">
         <span class="sidebar-icon">📄</span> Documents
       </button>
+      <button class="sidebar-btn" data-panel="lyrics" id="sb-lyrics">
+        <span class="sidebar-icon">🎵</span> Lyrics
+      </button>
 
       <span class="sidebar-label">System</span>
       <button class="sidebar-btn" data-panel="settings" id="sb-settings">
@@ -99,6 +102,11 @@
             <div class="stat-card-num" id="d-docs">0</div>
             <div class="stat-card-label">Documents</div>
           </div>
+          <div class="stat-card" id="dash-stat-lyrics">
+            <div class="stat-card-icon">🎵</div>
+            <div class="stat-card-num" id="d-lyrics">0</div>
+            <div class="stat-card-label">Lyrics</div>
+          </div>
           <div class="stat-card" id="dash-stat-traffic">
             <div class="stat-card-icon">📈</div>
             <div class="stat-card-num" id="d-traffic">0</div>
@@ -112,6 +120,7 @@
             <li>Go to <strong style="color:var(--c-text)">Photo Albums</strong> → paste a Google Drive <em>folder</em> share link (e.g., <code>https://drive.google.com/drive/folders/…</code>).</li>
             <li>Go to <strong style="color:var(--c-text)">Videos</strong> → paste any YouTube video URL and it will be embedded automatically.</li>
             <li>Go to <strong style="color:var(--c-text)">Documents</strong> → paste a Google Drive <em>file</em> share link for PDFs/docs.</li>
+            <li>Go to <strong style="color:var(--c-text)">Lyrics</strong> → paste a Google Drive <em>file</em> share link for Lyrics PDFs.</li>
             <li>All data is stored in your browser's local storage.</li>
           </ul>
         </div>
@@ -242,6 +251,42 @@
         <div class="admin-form-title" style="margin-bottom:1rem;">📋 All Documents (<span id="doc-count">0</span>)</div>
         <div class="admin-list" id="docsList">
           <div class="admin-empty-list">No documents yet.</div>
+        </div>
+      </section>
+
+      <!-- LYRICS ── -->
+      <section class="admin-panel" id="panel-lyrics">
+        <h1 class="admin-panel-title">Lyrics</h1>
+        <p class="admin-panel-sub">Add Google Drive PDF links for song lyrics.</p>
+
+        <div class="admin-form">
+          <div class="admin-form-title">➕ Add New Lyrics</div>
+
+          <div class="form-group">
+            <label class="form-label" for="lyric-title">Song Title *</label>
+            <input type="text" class="form-control" id="lyric-title" placeholder="e.g., Amazing Grace" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="lyric-url">Google Drive File URL *</label>
+            <input type="url" class="form-control" id="lyric-url"
+              placeholder="https://drive.google.com/file/d/.../view" />
+            <p class="form-hint">Open Drive file → Share → "Anyone with the link" → copy URL</p>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="lyric-date">Date Added</label>
+              <input type="date" class="form-control" id="lyric-date" />
+            </div>
+          </div>
+
+          <button class="btn btn-primary" id="addLyricBtn">Add Lyrics</button>
+        </div>
+
+        <div class="admin-form-title" style="margin-bottom:1rem;">📋 All Lyrics (<span id="lyric-count">0</span>)</div>
+        <div class="admin-list" id="lyricsList">
+          <div class="admin-empty-list">No lyrics yet.</div>
         </div>
       </section>
 

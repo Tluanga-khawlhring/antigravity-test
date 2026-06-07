@@ -152,6 +152,7 @@ function updateStats(data) {
   animateCount('statPhotos', data.photos?.length || 0);
   animateCount('statVideos', data.videos?.length || 0);
   animateCount('statDocs',   data.docs?.length   || 0);
+  animateCount('statLyrics', data.lyrics?.length || 0);
 }
 
 function animateCount(id, target) {
@@ -396,6 +397,38 @@ function renderDocs(data) {
   });
 }
 
+/* ─── RENDER LYRICS ──────────────────────────────────────── */
+function renderLyrics(data) {
+  const grid  = document.getElementById('lyricsGrid');
+  const empty = document.getElementById('lyricsEmpty');
+  if (!grid) return;
+
+  const lyrics = sortByDateDesc([...(data.lyrics || [])]);
+  [...grid.querySelectorAll('.doc-card')].forEach(el => el.remove());
+
+  if (lyrics.length === 0) {
+    if (empty) empty.style.display = '';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  lyrics.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'doc-card';
+    card.innerHTML = `
+      <div class="doc-icon">🎵</div>
+      <div class="doc-info">
+        <div class="doc-title">${item.title}</div>
+        <div class="doc-meta">${formatDate(item.date) || ''}</div>
+      </div>
+      <div class="doc-actions">
+        <a href="${item.url}" target="_blank" class="btn btn-sm btn-outline">Open</a>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
 /* ─── NAVBAR ─────────────────────────────────────────────── */
 function initNavbar() {
   const navbar    = document.getElementById('navbar');
@@ -494,6 +527,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderPhotos(data);
     renderVideos(data);
     renderDocs(data);
+    renderLyrics(data);
     updateStats(data);
   } catch(e) {
     console.error('Site init error:', e);
