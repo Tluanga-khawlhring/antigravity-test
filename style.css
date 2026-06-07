@@ -795,7 +795,7 @@ ul {
   background: var(--c-surface);
   border: 1px solid var(--c-border);
   border-radius: var(--radius-md);
-  padding: 0.8rem 1.2rem;
+  padding: 0.5rem 0.8rem;
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -1505,7 +1505,7 @@ textarea.form-control {
 
   /* Doc card tighter */
   .doc-card {
-    padding: 1rem 1rem;
+    padding: 0.5rem 0.6rem;
   }
 
   /* Back to top smaller */
