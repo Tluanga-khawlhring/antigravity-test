@@ -2330,3 +2330,31 @@ textarea.form-control {
   opacity: 1;
   transform: translateY(0);
 }
+
+/* ── AZ INDEX ────────────────────────────────────────────────── */
+.az-index {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 2rem;
+}
+
+.az-letter {
+  display: inline-block;
+  padding: 8px 14px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  color: var(--c-text);
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.az-letter:hover, .az-letter.active {
+  background: rgba(201, 168, 76, 0.15);
+  color: var(--c-gold);
+  border-color: var(--c-gold);
+  box-shadow: 0 0 12px rgba(201, 168, 76, 0.2);
+}

@@ -429,12 +429,14 @@ function renderDocs(data) {
 }
 
 /* ─── RENDER LYRICS ──────────────────────────────────────── */
-function renderLyrics(data) {
+let currentLyricsData = [];
+let activeLyricsLetter = 'All';
+
+function renderLyricsList(lyrics) {
   const grid  = document.getElementById('lyricsGrid');
   const empty = document.getElementById('lyricsEmpty');
   if (!grid) return;
-
-  const lyrics = sortByDateDesc([...(data.lyrics || [])]);
+  
   [...grid.querySelectorAll('.doc-card')].forEach(el => el.remove());
 
   if (lyrics.length === 0) {
@@ -459,6 +461,46 @@ function renderLyrics(data) {
     `;
     grid.appendChild(card);
   });
+}
+
+function initAZIndex(lyrics) {
+  const indexContainer = document.getElementById('lyricsAZIndex');
+  if (!indexContainer) return;
+  
+  indexContainer.innerHTML = '';
+  
+  const letters = ['All', ...Array.from(new Set(lyrics.map(l => (l.title || '#').charAt(0).toUpperCase())))].sort((a, b) => {
+    if (a === 'All') return -1;
+    if (b === 'All') return 1;
+    return a.localeCompare(b);
+  });
+  
+  letters.forEach(letter => {
+    const btn = document.createElement('button');
+    btn.className = 'az-letter' + (letter === activeLyricsLetter ? ' active' : '');
+    btn.textContent = letter;
+    btn.onclick = () => {
+      activeLyricsLetter = letter;
+      [...indexContainer.children].forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      
+      const filtered = letter === 'All' ? lyrics : lyrics.filter(l => (l.title || '#').charAt(0).toUpperCase() === letter);
+      renderLyricsList(filtered);
+    };
+    indexContainer.appendChild(btn);
+  });
+}
+
+function renderLyrics(data) {
+  const grid  = document.getElementById('lyricsGrid');
+  if (!grid) return;
+
+  currentLyricsData = [...(data.lyrics || [])].sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+  
+  initAZIndex(currentLyricsData);
+  
+  const filtered = activeLyricsLetter === 'All' ? currentLyricsData : currentLyricsData.filter(l => (l.title || '#').charAt(0).toUpperCase() === activeLyricsLetter);
+  renderLyricsList(filtered);
 }
 
 /* ─── NAVBAR ─────────────────────────────────────────────── */
