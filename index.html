@@ -25,6 +25,10 @@
   <link rel="stylesheet" href="style.css?v=4" />
   <script src="config.js"></script>
   <link rel="icon" type="image/png" href="./PinClipart.com_sadi-clipart_495337 (1).png" />
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 </head>
 
 <body>
@@ -70,7 +74,7 @@
       <a href="videos.html" class="btn btn-primary">Watch Video</a>
       <a href="./documents.html" class="btn btn-primary">Read Documents</a>
       <a href="lyrics.html" class="btn btn-primary">Get Lyrics</a>
-      <div style="margin-top: 1.5rem;">
+      <div id="subscribeContainer" style="margin-top: 1.5rem;">
         <button id="googleLoginBtn" class="btn btn-google">
           <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -80,6 +84,9 @@
           </svg>
           Login/Signup with Google
         </button>
+        <p id="subscribeBenefits" class="subscribe-benefits" style="display: none;">
+          Subscribe to support our ministry, get exclusive updates, and stay connected with the community!
+        </p>
       </div>
     </div>
     </div>
@@ -157,6 +164,51 @@
   <div class="lightbox" id="lightbox" role="dialog" aria-label="Media viewer">
     <button class="lightbox-close" id="lightboxClose" aria-label="Close">&times;</button>
     <div class="lightbox-body" id="lightboxBody"></div>
+  </div>
+
+  <!-- ── PAYMENT MODAL ───────────────────────────────────────────── -->
+  <div class="payment-modal-overlay" id="paymentModalOverlay">
+    <div class="payment-modal" id="paymentModal">
+      <button class="payment-close" id="paymentClose" aria-label="Close Payment">&times;</button>
+      <div class="payment-header">
+        <h2 class="payment-title">Complete Subscription</h2>
+        <p class="payment-subtitle">Scan the QR code or click the button below to pay via any UPI app (GPay, PhonePe, Paytm).</p>
+      </div>
+      <div class="payment-upi-section">
+        <div class="form-group" style="text-align: left; margin-bottom: 0.5rem;">
+          <label class="form-label">Subscription Duration</label>
+          <div class="duration-buttons" id="durationButtons">
+            <button type="button" class="btn-duration active" data-months="1">1 Mo</button>
+            <button type="button" class="btn-duration" data-months="3">3 Mo</button>
+            <button type="button" class="btn-duration" data-months="6">6 Mo</button>
+            <button type="button" class="btn-duration" data-months="12">1 Yr</button>
+          </div>
+        </div>
+
+        <div class="qr-container">
+          <img src="" alt="UPI QR Code" id="upiQrCode">
+        </div>
+        <p class="upi-id-text">UPI ID: <strong id="upiIdDisplay">tluangakhawlhring17@oksbi</strong></p>
+        <p class="upi-amount-text" style="font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--c-text);">Total Fee: <strong id="dynamicAmountText" style="color: var(--c-gold);">₹20</strong></p>
+        
+        <!-- Deep link for mobile users -->
+        <a href="#" class="btn btn-primary btn-pay-upi" id="upiDeepLink">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+            <line x1="12" y1="18" x2="12.01" y2="18"></line>
+          </svg>
+          Pay <span id="btnAmountText">₹20</span> with UPI App
+        </a>
+      </div>
+      <form class="payment-form" id="paymentForm">
+        <div class="form-group" style="margin-top: 1.5rem;">
+          <label class="form-label" for="transactionId">Transaction ID (UTR Number)</label>
+          <input type="text" id="transactionId" class="form-input" placeholder="Enter 12-digit UTR number" required minlength="12" maxlength="12">
+          <small class="form-help">Enter the 12-digit reference number after your payment succeeds.</small>
+        </div>
+        <button type="submit" class="btn btn-primary btn-pay" id="paySubmitBtn">Confirm Payment</button>
+      </form>
+    </div>
   </div>
 
   <!-- ── BACK TO TOP ─────────────────────────────────────────── -->

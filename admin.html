@@ -57,6 +57,9 @@
       <button class="sidebar-btn active" data-panel="dashboard" id="sb-dashboard">
         <span class="sidebar-icon">📊</span> Dashboard
       </button>
+      <button class="sidebar-btn" data-panel="subscribers" id="sb-subscribers">
+        <span class="sidebar-icon">👥</span> Subscribers
+      </button>
 
       <span class="sidebar-label">Content</span>
       <button class="sidebar-btn" data-panel="photos" id="sb-photos">
@@ -112,6 +115,11 @@
             <div class="stat-card-num" id="d-traffic">0</div>
             <div class="stat-card-label">Site Traffic</div>
           </div>
+          <div class="stat-card" id="dash-stat-subscribers">
+            <div class="stat-card-icon">👥</div>
+            <div class="stat-card-num" id="d-subscribers">0</div>
+            <div class="stat-card-label">Subscribers</div>
+          </div>
         </div>
 
         <div class="admin-form" style="margin-bottom:0">
@@ -123,6 +131,30 @@
             <li>Go to <strong style="color:var(--c-text)">Lyrics</strong> → paste a Google Drive <em>file</em> share link for Lyrics PDFs.</li>
             <li>All data is stored in your browser's local storage.</li>
           </ul>
+        </div>
+      </section>
+
+      <!-- SUBSCRIBERS ── -->
+      <section class="admin-panel" id="panel-subscribers">
+        <h1 class="admin-panel-title">👥 Subscribers</h1>
+        <p class="admin-panel-sub">Manage website subscriptions and verify payments.</p>
+        
+        <div class="subscribers-tabs" style="display:flex; gap:4px; margin-bottom:1.5rem; width:100%;">
+          <button class="btn btn-outline active" id="tab-active" onclick="switchSubTab('active')" style="flex:1; padding:6px 2px; font-size:0.75rem; text-align:center;">Active (<span id="subscriber-active-count">0</span>)</button>
+          <button class="btn btn-outline" id="tab-pending" onclick="switchSubTab('pending')" style="flex:1; padding:6px 2px; font-size:0.75rem; text-align:center;">Pending (<span id="subscriber-pending-count">0</span>)</button>
+          <button class="btn btn-outline" id="tab-expired" onclick="switchSubTab('expired')" style="flex:1; padding:6px 2px; font-size:0.75rem; text-align:center;">Expired (<span id="subscriber-expired-count">0</span>)</button>
+        </div>
+
+        <div class="admin-list" id="subscribersActiveList">
+          <div class="admin-empty-list" style="opacity:0.5">Loading...</div>
+        </div>
+
+        <div class="admin-list" id="subscribersPendingList" style="display:none;">
+          <div class="admin-empty-list" style="opacity:0.5">Loading...</div>
+        </div>
+
+        <div class="admin-list" id="subscribersExpiredList" style="display:none;">
+          <div class="admin-empty-list" style="opacity:0.5">Loading...</div>
         </div>
       </section>
 
@@ -246,9 +278,15 @@
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label" for="doc-date">Date</label>
+              <label class="form-label" for="doc-date">Upload Date</label>
               <input type="date" class="form-control" id="doc-date" />
             </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="doc-release-date">Public Release Date (Subscribers get instant access)</label>
+            <input type="date" class="form-control" id="doc-release-date" />
+            <p class="form-hint">Leave blank to make it instantly public for everyone.</p>
           </div>
 
           <button class="btn btn-primary" id="addDocBtn">Add Document</button>

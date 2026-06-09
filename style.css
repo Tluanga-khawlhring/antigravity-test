@@ -2346,3 +2346,279 @@ textarea.form-control {
   opacity: 1;
   transform: translateY(0);
 }
+
+/* ═══════════════════════════════════════════════════════════
+   PAYMENT MODAL
+   ═══════════════════════════════════════════════════════════ */
+.payment-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 12, 20, 0.85);
+  backdrop-filter: blur(12px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.payment-modal-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.payment-modal {
+  background: var(--c-bg2);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  width: 90%;
+  max-width: 320px;
+  position: relative;
+  transform: translateY(20px) scale(0.95);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 40px rgba(201, 168, 76, 0.1);
+}
+
+.payment-modal-overlay.open .payment-modal {
+  transform: translateY(0) scale(1);
+}
+
+.payment-close {
+  position: absolute;
+  top: 1rem;
+  right: 1.25rem;
+  background: transparent;
+  border: none;
+  color: var(--c-text-sub);
+  font-size: 1.8rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.payment-close:hover {
+  color: var(--c-gold);
+}
+
+.payment-header {
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.payment-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  color: var(--c-gold);
+  margin-bottom: 0.2rem;
+}
+
+.payment-subtitle {
+  font-size: 0.75rem;
+  color: var(--c-text-sub);
+  margin-bottom: 0;
+}
+
+.payment-form .form-group {
+  margin-bottom: 0.5rem;
+}
+
+.payment-upi-section {
+  text-align: center;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.qr-container {
+  background: white;
+  padding: 10px;
+  border-radius: 8px;
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+.qr-container img {
+  display: block;
+  width: 90px;
+  height: 90px;
+}
+
+.upi-id-text {
+  font-size: 0.75rem;
+  color: var(--c-text-sub);
+  margin-bottom: 0.25rem;
+}
+
+.upi-id-text strong {
+  color: var(--c-gold);
+}
+
+.btn-pay-upi {
+  width: 100%;
+  justify-content: center;
+  padding: 8px;
+  font-size: 0.85rem;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--c-text);
+  margin-bottom: 0.5rem;
+}
+
+.btn-pay-upi:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: var(--c-gold);
+}
+
+.form-help {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--c-text-sub);
+}
+
+.duration-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.btn-duration {
+  flex: 1;
+  padding: 8px 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-sm);
+  color: var(--c-text-sub);
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-duration:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--c-text);
+}
+
+.btn-duration.active {
+  background: rgba(201, 168, 76, 0.15);
+  border-color: var(--c-gold);
+  color: var(--c-gold);
+}
+
+.payment-form .form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.payment-form .form-row .form-group {
+  flex: 1;
+}
+
+.payment-form .form-label {
+  display: block;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--c-text-sub);
+  margin-bottom: 0.4rem;
+}
+
+.payment-form .form-input {
+  width: 100%;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-sm);
+  color: var(--c-text);
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+.payment-form .form-input:focus {
+  outline: none;
+  border-color: var(--c-gold);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.payment-form .btn-pay {
+  width: 100%;
+  justify-content: center;
+  padding: 10px;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.payment-form .btn-pay:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SUBSCRIBE BUTTON
+   ═══════════════════════════════════════════════════════════ */
+.btn-subscribe {
+  background: rgba(201, 168, 76, 0.15);
+  color: var(--c-gold);
+  border: 1px solid var(--c-gold);
+  box-shadow: 0 0 15px rgba(201, 168, 76, 0.2);
+}
+
+.btn-subscribe:hover {
+  background: rgba(201, 168, 76, 0.25);
+  box-shadow: 0 0 25px rgba(201, 168, 76, 0.4);
+  transform: translateY(-2px);
+}
+
+.subscribe-benefits {
+  font-size: 0.85rem;
+  color: var(--c-text-sub);
+  margin-top: 0.75rem;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.4;
+  animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── BUTTON STATES ── */
+.btn-pending {
+  background: rgba(241, 196, 15, 0.1) !important;
+  border-color: #f1c40f !important;
+  color: #f1c40f !important;
+  cursor: not-allowed;
+  box-shadow: 0 0 15px rgba(241, 196, 15, 0.2);
+}
+
+.btn-active {
+  background: rgba(46, 204, 113, 0.1) !important;
+  border-color: #2ecc71 !important;
+  color: #2ecc71 !important;
+  cursor: default;
+  box-shadow: 0 0 15px rgba(46, 204, 113, 0.2);
+}
+
+.btn-denied {
+  background: rgba(231, 76, 60, 0.1) !important;
+  border-color: #e74c3c !important;
+  color: #e74c3c !important;
+  cursor: pointer;
+  white-space: normal;
+  height: auto;
+  line-height: 1.4;
+  padding: 12px;
+  box-shadow: 0 0 15px rgba(231, 76, 60, 0.2);
+}
+.btn-denied:hover {
+  background: rgba(231, 76, 60, 0.2) !important;
+  box-shadow: 0 0 25px rgba(231, 76, 60, 0.4);
+}

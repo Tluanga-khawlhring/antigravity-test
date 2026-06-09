@@ -211,18 +211,26 @@ async function updateDashboard() {
   if (dl) dl.textContent = d.lyrics?.length || 0;
 
   const dt = document.getElementById('d-traffic');
-  if (dt) {
+  const ds = document.getElementById('d-subscribers');
+  if (dt || ds) {
     const url = getFirebaseUrl().replace(/\/$/, '');
     if (url) {
       try {
-        const res = await fetch(url + '/traffic.json');
-        if (res.ok) {
-          const traffic = await res.json();
-          dt.textContent = traffic || 0;
+        if (dt) {
+          const res = await fetch(url + '/traffic.json');
+          if (res.ok) dt.textContent = await res.json() || 0;
+        }
+        if (ds) {
+          const res = await fetch(url + '/subscribers.json');
+          if (res.ok) {
+            const subs = await res.json();
+            ds.textContent = subs ? Object.keys(subs).length : 0;
+          }
         }
       } catch {}
     } else {
-      dt.textContent = 0;
+      if (dt) dt.textContent = 0;
+      if (ds) ds.textContent = 0;
     }
   }
 }
@@ -291,15 +299,21 @@ function openEditModal(type, id, item) {
         <label class="form-label">Google Drive File URL *</label>
         <input type="url" class="form-control" id="edit-url" value="${escHtml(item.url)}" />
       </div>
-      <div class="form-group">
-        <label class="form-label">Category</label>
-        <select class="form-control" id="edit-category">
-          <option value="">Select…</option>${opts}
-        </select>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-control" id="edit-category">
+            <option value="">Select…</option>${opts}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Upload Date</label>
+          <input type="date" class="form-control" id="edit-date" value="${item.date||''}" />
+        </div>
       </div>
       <div class="form-group">
-        <label class="form-label">Date</label>
-        <input type="date" class="form-control" id="edit-date" value="${item.date||''}" />
+        <label class="form-label">Public Release Date (Subscribers get instant access)</label>
+        <input type="date" class="form-control" id="edit-release-date" value="${item.releaseDate||''}" />
       </div>`;
   } else if (type === 'lyrics') {
     title.innerHTML = '✏️ Edit Lyrics';
@@ -356,7 +370,10 @@ async function saveEdit() {
       date: document.getElementById('edit-date')?.value || '' };
     if (type==='photos')  updated.description = document.getElementById('edit-desc')?.value.trim()||'';
     if (type==='videos')  updated.preacher    = document.getElementById('edit-preacher')?.value.trim()||'';
-    if (type==='docs')    updated.category    = document.getElementById('edit-category')?.value||'';
+    if (type==='docs') {
+      updated.category = document.getElementById('edit-category')?.value||'';
+      updated.releaseDate = document.getElementById('edit-release-date')?.value||'';
+    }
 
     data[type][idx] = updated;
     await saveData(data);
@@ -516,12 +533,21 @@ async function renderDocsList() {
     list.innerHTML = '<div class="admin-empty-list">No documents yet. Add your first document above.</div>';
     return;
   }
-  list.innerHTML = docs.map(item => `
+  
+  const now = new Date();
+  
+  list.innerHTML = docs.map(item => {
+    let earlyAccessTag = '';
+    if (item.releaseDate && new Date(item.releaseDate) > now) {
+      earlyAccessTag = ` · <span style="color:var(--c-gold)">🔒 Early Access until ${formatDate(item.releaseDate)}</span>`;
+    }
+    
+    return `
     <div class="admin-list-item">
       <div class="admin-list-icon">📄</div>
       <div class="admin-list-info">
         <div class="admin-list-name">${escHtml(item.title)}</div>
-        <div class="admin-list-meta">${escHtml(item.category||'Document')} · ${formatDate(item.date)||'No date'}</div>
+        <div class="admin-list-meta">${escHtml(item.category||'Document')} · ${formatDate(item.date)||'No upload date'}${earlyAccessTag}</div>
         <div class="admin-list-meta" style="margin-top:2px">
           <a href="${item.url}" target="_blank" style="color:var(--c-gold);opacity:.85">Open Drive File ↗</a></div>
       </div>
@@ -529,14 +555,16 @@ async function renderDocsList() {
         <button class="btn btn-edit btn-sm" onclick="editItem('docs','${item.id}')">✏️ Edit</button>
         <button class="btn btn-danger btn-sm" onclick="deleteItem('docs','${item.id}')">Delete</button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 async function addDoc() {
-  const title    = document.getElementById('doc-title').value.trim();
-  const url      = document.getElementById('doc-url').value.trim();
-  const category = document.getElementById('doc-category').value;
-  const date     = document.getElementById('doc-date').value;
+  const title       = document.getElementById('doc-title').value.trim();
+  const url         = document.getElementById('doc-url').value.trim();
+  const category    = document.getElementById('doc-category').value;
+  const date        = document.getElementById('doc-date').value;
+  const releaseDate = document.getElementById('doc-release-date').value;
 
   if (!title) { toast('Please enter a document title.','error'); return; }
   if (!url)   { toast('Please enter a Google Drive file URL.','error'); return; }
@@ -546,9 +574,9 @@ async function addDoc() {
   btn.disabled = true; btn.textContent = 'Adding…';
   try {
     const data = await loadData();
-    data.docs.unshift({ id: uid(), title, url, category, date });
+    data.docs.unshift({ id: uid(), title, url, category, date, releaseDate });
     const synced = await saveData(data);
-    ['doc-title','doc-url','doc-date'].forEach(id => document.getElementById(id).value='');
+    ['doc-title','doc-url','doc-date','doc-release-date'].forEach(id => document.getElementById(id).value='');
     document.getElementById('doc-category').value='';
     await renderDocsList();
     updateDashboard();
@@ -691,6 +719,194 @@ async function addLyricBulk() {
     btn.disabled = false; btn.textContent = 'Bulk Add Lyrics';
   }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   SUBSCRIBERS
+   ═══════════════════════════════════════════════════════════ */
+async function renderSubscribersList() {
+  const listPending = document.getElementById('subscribersPendingList');
+  const listActive = document.getElementById('subscribersActiveList');
+  const listExpired = document.getElementById('subscribersExpiredList');
+  
+  const cntPending = document.getElementById('subscriber-pending-count');
+  const cntActive = document.getElementById('subscriber-active-count');
+  const cntExpired = document.getElementById('subscriber-expired-count');
+  
+  if (!listPending || !listActive || !listExpired) return;
+
+  const url = getFirebaseUrl().replace(/\/$/, '');
+  if (!url) {
+    listPending.innerHTML = '<div class="admin-empty-list">Please connect Firebase in Settings first.</div>';
+    listActive.innerHTML = ''; listExpired.innerHTML = '';
+    return;
+  }
+
+  try {
+    const res = await fetch(url + '/subscribers.json');
+    const data = await res.json();
+    
+    if (!data) {
+      if (cntPending) cntPending.textContent = '0';
+      if (cntActive) cntActive.textContent = '0';
+      if (cntExpired) cntExpired.textContent = '0';
+      listPending.innerHTML = '<div class="admin-empty-list">No pending subscribers.</div>';
+      listActive.innerHTML = '<div class="admin-empty-list">No active subscribers.</div>';
+      listExpired.innerHTML = '<div class="admin-empty-list">No expired subscribers.</div>';
+      return;
+    }
+
+    const subsArray = Object.keys(data).map(key => ({
+      uid: key,
+      ...data[key]
+    })).sort((a, b) => new Date(b.subscribedAt) - new Date(a.subscribedAt));
+
+    const pending = [];
+    const active = [];
+    const expired = [];
+    const now = new Date();
+
+    subsArray.forEach(sub => {
+      let isExpired = false;
+      if (sub.paymentStatus === 'active' && sub.approvedAt) {
+        const expiresAt = new Date(sub.approvedAt);
+        expiresAt.setMonth(expiresAt.getMonth() + (sub.durationMonths || 1));
+        sub.expiresAt = expiresAt;
+        if (now > expiresAt) isExpired = true;
+      }
+
+      if (isExpired) {
+        expired.push(sub);
+      } else if (sub.paymentStatus === 'active') {
+        active.push(sub);
+      } else {
+        // pending_verification or denied
+        pending.push(sub);
+      }
+    });
+
+    if (cntPending) cntPending.textContent = pending.length;
+    if (cntActive) cntActive.textContent = active.length;
+    if (cntExpired) cntExpired.textContent = expired.length;
+
+    function renderItem(sub) {
+      const isPending = sub.paymentStatus === 'pending_verification';
+      const isDenied = sub.paymentStatus === 'denied';
+      let isExpired = false;
+      
+      let statusColor = '#2ecc71';
+      let statusText = 'Verified & Active';
+      let expiryText = '';
+
+      if (sub.expiresAt) {
+        if (now > sub.expiresAt) {
+          isExpired = true;
+          statusColor = '#e74c3c';
+          statusText = 'Expired';
+        }
+        expiryText = `<strong>Expires:</strong> ${formatDate(sub.expiresAt.toISOString())}`;
+      }
+
+      if (isPending) { statusColor = 'var(--c-gold)'; statusText = 'Pending Verification'; }
+      else if (isDenied) { statusColor = '#e74c3c'; statusText = 'Denied'; }
+
+      return `
+      <div class="admin-list-item" style="align-items: center;">
+        <div class="admin-list-icon">👥</div>
+        <div class="admin-list-info" style="flex: 1;">
+          <div class="admin-list-name" style="font-size: 1.05rem;">${escHtml(sub.name || 'Unknown')}</div>
+          <div class="admin-list-meta" style="color: var(--c-text);">${escHtml(sub.email || 'No email')}</div>
+          <div class="admin-list-meta" style="margin-top:4px;">
+            <strong>Duration:</strong> ${sub.durationMonths || 1} Month(s) · 
+            <strong>Total Paid:</strong> ₹${sub.totalPaid || 20}
+          </div>
+          <div class="admin-list-meta">
+            <strong>UTR:</strong> <span style="font-family: monospace; letter-spacing: 1px;">${escHtml(sub.transactionId || 'N/A')}</span>
+          </div>
+          <div class="admin-list-meta">
+            <strong>Status:</strong> <span style="color: ${statusColor}; font-weight: bold;">${statusText}</span>
+            ${expiryText ? `<br/>${expiryText}` : ''}
+          </div>
+        </div>
+        <div class="admin-list-actions" style="display: flex; flex-direction: column; gap: 0.5rem; justify-content: center;">
+          ${isPending ? `
+            <button class="btn btn-primary btn-sm" onclick="approveSubscriber('${sub.uid}')">Verify</button>
+            <button class="btn btn-outline btn-sm" onclick="denySubscriber('${sub.uid}')" style="border-color:#e74c3c; color:#e74c3c">Deny</button>
+          ` : ''}
+          <button class="btn btn-danger btn-sm" onclick="deleteSubscriber('${sub.uid}')">Delete</button>
+        </div>
+      </div>`;
+    }
+
+    listPending.innerHTML = pending.length ? pending.map(renderItem).join('') : '<div class="admin-empty-list">No pending subscribers.</div>';
+    listActive.innerHTML = active.length ? active.map(renderItem).join('') : '<div class="admin-empty-list">No active subscribers.</div>';
+    listExpired.innerHTML = expired.length ? expired.map(renderItem).join('') : '<div class="admin-empty-list">No expired subscribers.</div>';
+
+  } catch (e) {
+    if (listPending) listPending.innerHTML = `<div class="admin-empty-list" style="color:var(--c-gold)">Error loading subscribers: ${e.message}</div>`;
+  }
+}
+
+window.switchSubTab = function(tabName) {
+  const tabs = ['active', 'pending', 'expired'];
+  tabs.forEach(t => {
+    const btn = document.getElementById(`tab-${t}`);
+    const list = document.getElementById(`subscribers${t.charAt(0).toUpperCase() + t.slice(1)}List`);
+    if (btn && list) {
+      if (t === tabName) {
+        btn.classList.add('active');
+        list.style.display = 'block';
+      } else {
+        btn.classList.remove('active');
+        list.style.display = 'none';
+      }
+    }
+  });
+};
+
+window.approveSubscriber = async function(uid) {
+  if (!confirm('Are you sure you want to verify this payment and activate the subscription?')) return;
+  const url = getFirebaseUrl().replace(/\/$/, '');
+  try {
+    const res = await fetch(`${url}/subscribers/${uid}.json`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        paymentStatus: 'active',
+        approvedAt: new Date().toISOString()
+      })
+    });
+    if (!res.ok) throw new Error('Update failed');
+    toast('Subscription verified successfully!');
+    await renderSubscribersList();
+  } catch(e) { toast('Verification failed: ' + e.message, 'error'); }
+};
+
+window.denySubscriber = async function(uid) {
+  if (!confirm('Are you sure you want to DENY this payment? The user will be asked to re-enter a valid UTR.')) return;
+  const url = getFirebaseUrl().replace(/\/$/, '');
+  try {
+    const res = await fetch(`${url}/subscribers/${uid}.json`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paymentStatus: 'denied' })
+    });
+    if (!res.ok) throw new Error('Update failed');
+    toast('Subscription denied.');
+    await renderSubscribersList();
+  } catch(e) { toast('Deny failed: ' + e.message, 'error'); }
+};
+
+window.deleteSubscriber = async function(uid) {
+  if (!confirm('Are you sure you want to completely delete this subscriber?')) return;
+  const url = getFirebaseUrl().replace(/\/$/, '');
+  try {
+    const res = await fetch(`${url}/subscribers/${uid}.json`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Delete failed');
+    toast('Subscriber deleted.');
+    await renderSubscribersList();
+    updateDashboard();
+  } catch(e) { toast('Delete failed: ' + e.message, 'error'); }
+};
 
 /* ─── GLOBAL EDIT / DELETE ───────────────────────────────── */
 window.editItem = async function(type, id) {
@@ -858,6 +1074,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await renderVideosList();
   await renderDocsList();
   await renderLyricsList();
+  await renderSubscribersList();
   
   initScrollAnimations();
 
