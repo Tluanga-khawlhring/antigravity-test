@@ -1,0 +1,21 @@
+{
+	"dbConnectionString": "postgres://localhost:64558/postgres",
+	"geolocation": {
+		"data": {
+			"city": "Dimāpur",
+			"country": {
+				"code": "IN",
+				"name": "India"
+			},
+			"subdivision": {
+				"code": "NL",
+				"name": "Nagaland"
+			},
+			"timezone": "Asia/Kolkata",
+			"latitude": 25.9169,
+			"longitude": 93.7274,
+			"postalCode": "797112"
+		},
+		"timestamp": 1780954362938
+	}
+}

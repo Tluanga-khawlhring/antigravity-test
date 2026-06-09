@@ -371,6 +371,22 @@ ul {
   background: rgba(239, 68, 68, 0.25);
 }
 
+.btn-google {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--c-text);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  margin-top: 0.5rem;
+  gap: 12px;
+}
+
+.btn-google:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
 .hero-scroll-hint {
   position: absolute;
   bottom: 2rem;
