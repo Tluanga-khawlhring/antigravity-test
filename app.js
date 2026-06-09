@@ -683,13 +683,12 @@ function initLogin() {
       loginBtn.innerHTML = `Click to Subscribe`;
       loginBtn.className = 'btn btn-subscribe';
     }
-  }
 
-  // Re-render documents if data is available, to update locks based on auth state
-  if (window._lastLoadedData) {
-    renderDocs(window._lastLoadedData);
+    // Re-render documents if data is available, to update locks based on auth state
+    if (window._lastLoadedData) {
+      renderDocs(window._lastLoadedData);
+    }
   }
-}
 
   // Listen for auth state changes to persist login automatically
   if (typeof firebase !== 'undefined') {
