@@ -227,6 +227,7 @@ async function trackTraffic() {
   }
 }
 
+
 /* ─── RENDER PHOTOS ──────────────────────────────────────── */
 async function renderPhotos(data) {
   const grid  = document.getElementById('photosGrid');
@@ -424,6 +425,11 @@ function renderDocs(data) {
       card.href = 'javascript:void(0)';
       card.onclick = (e) => {
         e.preventDefault();
+        if (!window.currentUserUid) {
+          alert('Please login with Google first to subscribe for early access!');
+          return;
+        }
+        
         const overlay = document.getElementById('paymentModalOverlay');
         if (overlay) {
           overlay.classList.add('open');
@@ -679,6 +685,12 @@ function initLogin() {
     }
   }
 
+  // Re-render documents if data is available, to update locks based on auth state
+  if (window._lastLoadedData) {
+    renderDocs(window._lastLoadedData);
+  }
+}
+
   // Listen for auth state changes to persist login automatically
   if (typeof firebase !== 'undefined') {
     firebase.auth().onAuthStateChanged((user) => {
@@ -863,6 +875,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Load data (Firebase or local)
     const data = await fetchData();
+    window._lastLoadedData = data;
     trackTraffic();
 
     renderPhotos(data);
