@@ -595,7 +595,6 @@ function initScrollAnimations() {
 /* ─── LOGIN ──────────────────────────────────────────────── */
 function initLogin() {
   const loginBtn = document.getElementById('googleLoginBtn');
-  if (!loginBtn) return;
 
   // Initialize Firebase Auth using the existing config data
   const firebaseConfig = window.SK_CONFIG?.firebaseConfig || {
@@ -615,26 +614,36 @@ function initLogin() {
 
   window.currentUserSubscriptionStatus = null;
 
+  // Return a promise that resolves once Firebase auth state is known (first call)
+  // This lets the main init await auth before rendering docs
+  return new Promise((resolve) => {
+
   async function updateButtonState(user) {
     const benefitsText = document.getElementById('subscribeBenefits');
     
     if (!user) {
-      loginBtn.innerHTML = `
-        <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-        </svg>
-        Login/Signup with Google
-      `;
-      loginBtn.className = 'btn btn-google';
+      window.currentUserUid = null;
+      if (loginBtn) {
+        loginBtn.innerHTML = `
+          <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          Login/Signup with Google
+        `;
+        loginBtn.className = 'btn btn-google';
+      }
       if (benefitsText) benefitsText.style.display = 'none';
       return;
     }
 
-    loginBtn.innerHTML = 'Loading status...';
-    loginBtn.className = 'btn btn-outline';
+    window.currentUserUid = user.uid;
+    if (loginBtn) {
+      loginBtn.innerHTML = 'Loading status...';
+      loginBtn.className = 'btn btn-outline';
+    }
     
     const dbUrl = getFirebaseUrl().replace(/\/$/, '');
     if (!dbUrl) return;
@@ -645,8 +654,10 @@ function initLogin() {
       
       if (!subData) {
         window.currentUserSubscriptionStatus = 'not_subscribed';
-        loginBtn.innerHTML = `Click to Subscribe`;
-        loginBtn.className = 'btn btn-subscribe';
+        if (loginBtn) {
+          loginBtn.innerHTML = `Click to Subscribe`;
+          loginBtn.className = 'btn btn-subscribe';
+        }
         if (benefitsText) benefitsText.style.display = 'block';
       } else {
         let isExpired = false;
@@ -658,30 +669,36 @@ function initLogin() {
 
         if (isExpired) {
           window.currentUserSubscriptionStatus = 'expired';
-          loginBtn.innerHTML = `Subscription Expired - Click to Renew`;
-          loginBtn.className = 'btn btn-subscribe';
+          if (loginBtn) {
+            loginBtn.innerHTML = `Subscription Expired - Click to Renew`;
+            loginBtn.className = 'btn btn-subscribe';
+          }
           if (benefitsText) benefitsText.style.display = 'block';
         } else {
           window.currentUserSubscriptionStatus = subData.paymentStatus;
-          if (subData.paymentStatus === 'pending_verification') {
-            loginBtn.innerHTML = `Pending Subscription`;
-            loginBtn.className = 'btn btn-pending';
-            if (benefitsText) benefitsText.style.display = 'none';
-          } else if (subData.paymentStatus === 'active') {
-            loginBtn.innerHTML = `Thank you for subscribing!`;
-            loginBtn.className = 'btn btn-active';
-            if (benefitsText) benefitsText.style.display = 'none';
-          } else if (subData.paymentStatus === 'denied') {
-            loginBtn.innerHTML = `Incorrect payment, re-enter correct Transaction ID`;
-            loginBtn.className = 'btn btn-denied';
+          if (loginBtn) {
+            if (subData.paymentStatus === 'pending_verification') {
+              loginBtn.innerHTML = `Pending Subscription`;
+              loginBtn.className = 'btn btn-pending';
+            } else if (subData.paymentStatus === 'active') {
+              loginBtn.innerHTML = `Thank you for subscribing!`;
+              loginBtn.className = 'btn btn-active';
+            } else if (subData.paymentStatus === 'denied') {
+              loginBtn.innerHTML = `Incorrect payment, re-enter correct Transaction ID`;
+              loginBtn.className = 'btn btn-denied';
+            }
+          }
+          if (subData.paymentStatus !== 'error') {
             if (benefitsText) benefitsText.style.display = 'none';
           }
         }
       }
     } catch(e) {
       window.currentUserSubscriptionStatus = 'error';
-      loginBtn.innerHTML = `Click to Subscribe`;
-      loginBtn.className = 'btn btn-subscribe';
+      if (loginBtn) {
+        loginBtn.innerHTML = `Click to Subscribe`;
+        loginBtn.className = 'btn btn-subscribe';
+      }
     }
 
     // Re-render documents if data is available, to update locks based on auth state
@@ -690,14 +707,24 @@ function initLogin() {
     }
   }
 
-  // Listen for auth state changes to persist login automatically
-  if (typeof firebase !== 'undefined') {
-    firebase.auth().onAuthStateChanged((user) => {
-      updateButtonState(user);
-    });
-  }
+    let resolved = false;
 
-  // Payment Modal Logic
+    // Listen for auth state changes to persist login automatically
+    if (typeof firebase !== 'undefined') {
+      firebase.auth().onAuthStateChanged(async (user) => {
+        await updateButtonState(user);
+        // Resolve the promise the first time auth state is known
+        if (!resolved) {
+          resolved = true;
+          resolve();
+        }
+      });
+    } else {
+      // No firebase — resolve immediately so page doesn't hang
+      resolve();
+    }
+
+  // Payment Modal Logic (only exists on index.html)
   const paymentModalOverlay = document.getElementById('paymentModalOverlay');
   const paymentClose = document.getElementById('paymentClose');
   const paymentForm = document.getElementById('paymentForm');
@@ -721,33 +748,35 @@ function initLogin() {
     });
   }
 
-  loginBtn.addEventListener('click', async (e) => {
-    e.preventDefault();
-    if (typeof firebase === 'undefined') {
-      alert("Firebase SDK is not loaded.");
-      return;
-    }
-
-    try {
-      const user = firebase.auth().currentUser;
-      if (user) {
-        if (window.currentUserSubscriptionStatus === 'pending_verification' || window.currentUserSubscriptionStatus === 'active') {
-          return; // Button disabled in these states
-        }
-        // Handle Subscribe Action -> Open Payment Modal First
-        if (paymentModalOverlay) {
-          paymentModalOverlay.classList.add('open');
-          document.body.style.overflow = 'hidden';
-        }
-      } else {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        await firebase.auth().signInWithPopup(provider);
+  if (loginBtn) {
+    loginBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      if (typeof firebase === 'undefined') {
+        alert("Firebase SDK is not loaded.");
+        return;
       }
-    } catch (error) {
-      console.error('Authentication Error:', error);
-      alert('Authentication failed: ' + error.message + '\nMake sure Google Sign-in is enabled in your Firebase console.');
-    }
-  });
+
+      try {
+        const user = firebase.auth().currentUser;
+        if (user) {
+          if (window.currentUserSubscriptionStatus === 'pending_verification' || window.currentUserSubscriptionStatus === 'active') {
+            return; // Button disabled in these states
+          }
+          // Handle Subscribe Action -> Open Payment Modal First
+          if (paymentModalOverlay) {
+            paymentModalOverlay.classList.add('open');
+            document.body.style.overflow = 'hidden';
+          }
+        } else {
+          const provider = new firebase.auth.GoogleAuthProvider();
+          await firebase.auth().signInWithPopup(provider);
+        }
+      } catch (error) {
+        console.error('Authentication Error:', error);
+        alert('Authentication failed: ' + error.message + '\nMake sure Google Sign-in is enabled in your Firebase console.');
+      }
+    });
+  }
 
   // Handle Dynamic Pricing with Buttons
   const durationButtons = document.querySelectorAll('.btn-duration');
@@ -848,6 +877,8 @@ function initLogin() {
       }
     });
   }
+
+  }); // end of returned Promise
 }
 
 /* ─── INIT ───────────────────────────────────────────────── */
@@ -866,7 +897,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     initNavbar();
     initParticles();
-    initLogin();
+    await initLogin();
 
     // Back to top
     const backBtn = document.getElementById('backToTop');
